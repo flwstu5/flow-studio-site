@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { H as H3Event, t as toResponse } from "../_libs/h3-v2.mjs";
-import { q as resolveManifestAssetLink, j as rootRouteId, u as getNormalizedURL, v as getOrigin, w as attachRouterServerSsrUtils, x as defineHandlerCallback, y as createSerializationAdapter, z as createRawStreamRPCPlugin, i as invariant, g as isNotFound, l as isRedirect, A as isResolvedRedirect, C as mergeHeaders, D as executeRewriteInput, E as defaultSerovalPlugins, F as makeSerovalPlugin } from "../_libs/tanstack__router-core.mjs";
+import { u as parseRedirect, v as mergeHeaders, l as isRedirect, q as resolveManifestAssetLink, j as rootRouteId, w as getNormalizedURL, x as getOrigin, y as attachRouterServerSsrUtils, z as defineHandlerCallback, A as createSerializationAdapter, C as createRawStreamRPCPlugin, i as invariant, g as isNotFound, D as isResolvedRedirect, E as executeRewriteInput, F as defaultSerovalPlugins, G as makeSerovalPlugin } from "../_libs/tanstack__router-core.mjs";
 import { c as cu, O as Ou, l as lu } from "../_libs/seroval.mjs";
 import { c as createMemoryHistory } from "../_libs/tanstack__history.mjs";
 import { j as jsxRuntimeExports } from "../_libs/react.mjs";
@@ -85,7 +85,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-DV40AZ1c.mjs");
+  const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-Chy6kdw3.mjs");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -109,7 +109,12 @@ async function getStartManifest(matchedRoutes) {
     injectedHeadScripts
   };
 }
-const manifest = {};
+const manifest = {
+  "dbc5c64a72e5c37ef7dda6c1e8151a7452ac6a6525097c03d85e5c944a253eac": {
+    functionName: "submitIntake_createServerFn_handler",
+    importer: () => import("./intake-Cd7pILeT.mjs")
+  }
+};
 async function getServerFnById(id, access) {
   const serverFnInfo = manifest[id];
   if (!serverFnInfo) {
@@ -127,6 +132,7 @@ async function getServerFnById(id, access) {
 }
 var TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";
 var TSS_SERVER_FUNCTION = /* @__PURE__ */ Symbol.for("TSS_SERVER_FUNCTION");
+var TSS_SERVER_FUNCTION_FACTORY = /* @__PURE__ */ Symbol.for("TSS_SERVER_FUNCTION_FACTORY");
 var X_TSS_SERIALIZED = "x-tss-serialized";
 var X_TSS_RAW_RESPONSE = "x-tss-raw";
 var TSS_CONTENT_TYPE_FRAMED = "application/x-tss-framed";
@@ -170,6 +176,146 @@ function getStartContext(opts) {
   return context;
 }
 var getStartOptions = () => getStartContext().startOptions;
+var getStartContextServerOnly = getStartContext;
+var createServerFn = (options, __opts) => {
+  const resolvedOptions = __opts || options || {};
+  if (typeof resolvedOptions.method === "undefined") resolvedOptions.method = "GET";
+  const res = {
+    options: resolvedOptions,
+    middleware: (middleware) => {
+      const newMiddleware = [...resolvedOptions.middleware || []];
+      middleware.map((m) => {
+        if (TSS_SERVER_FUNCTION_FACTORY in m) {
+          if (m.options.middleware) newMiddleware.push(...m.options.middleware);
+        } else newMiddleware.push(m);
+      });
+      const res2 = createServerFn(void 0, {
+        ...resolvedOptions,
+        middleware: newMiddleware
+      });
+      res2[TSS_SERVER_FUNCTION_FACTORY] = true;
+      return res2;
+    },
+    inputValidator: (inputValidator) => {
+      return createServerFn(void 0, {
+        ...resolvedOptions,
+        inputValidator
+      });
+    },
+    handler: (...args) => {
+      const [extractedFn, serverFn] = args;
+      const newOptions = {
+        ...resolvedOptions,
+        extractedFn,
+        serverFn
+      };
+      const resolvedMiddleware = [...newOptions.middleware || [], serverFnBaseToMiddleware(newOptions)];
+      extractedFn.method = resolvedOptions.method;
+      return Object.assign(async (opts) => {
+        const result = await executeMiddleware$1(resolvedMiddleware, "client", {
+          ...extractedFn,
+          ...newOptions,
+          data: opts?.data,
+          headers: opts?.headers,
+          signal: opts?.signal,
+          fetch: opts?.fetch,
+          context: createNullProtoObject()
+        });
+        const redirect = parseRedirect(result.error);
+        if (redirect) throw redirect;
+        if (result.error) throw result.error;
+        return result.result;
+      }, {
+        ...extractedFn,
+        method: resolvedOptions.method,
+        __executeServer: async (opts) => {
+          const startContext = getStartContextServerOnly();
+          const serverContextAfterGlobalMiddlewares = startContext.contextAfterGlobalMiddlewares;
+          return await executeMiddleware$1(resolvedMiddleware, "server", {
+            ...extractedFn,
+            ...opts,
+            serverFnMeta: extractedFn.serverFnMeta,
+            context: safeObjectMerge(opts.context, serverContextAfterGlobalMiddlewares),
+            request: startContext.request
+          }).then((d) => ({
+            result: d.result,
+            error: d.error,
+            context: d.sendContext
+          }));
+        }
+      });
+    }
+  };
+  const fun = (options2) => {
+    return createServerFn(void 0, {
+      ...resolvedOptions,
+      ...options2
+    });
+  };
+  return Object.assign(fun, res);
+};
+async function executeMiddleware$1(middlewares, env, opts) {
+  let flattenedMiddlewares = flattenMiddlewares([...getStartOptions()?.functionMiddleware || [], ...middlewares]);
+  if (env === "server") {
+    const startContext = getStartContextServerOnly({ throwIfNotFound: false });
+    if (startContext?.executedRequestMiddlewares) flattenedMiddlewares = flattenedMiddlewares.filter((m) => !startContext.executedRequestMiddlewares.has(m));
+  }
+  const callNextMiddleware = async (ctx) => {
+    const nextMiddleware = flattenedMiddlewares.shift();
+    if (!nextMiddleware) return ctx;
+    try {
+      if ("inputValidator" in nextMiddleware.options && nextMiddleware.options.inputValidator && env === "server") ctx.data = await execValidator(nextMiddleware.options.inputValidator, ctx.data);
+      let middlewareFn = void 0;
+      if (env === "client") {
+        if ("client" in nextMiddleware.options) middlewareFn = nextMiddleware.options.client;
+      } else if ("server" in nextMiddleware.options) middlewareFn = nextMiddleware.options.server;
+      if (middlewareFn) {
+        const userNext = async (userCtx = {}) => {
+          const result2 = await callNextMiddleware({
+            ...ctx,
+            ...userCtx,
+            context: safeObjectMerge(ctx.context, userCtx.context),
+            sendContext: safeObjectMerge(ctx.sendContext, userCtx.sendContext),
+            headers: mergeHeaders(ctx.headers, userCtx.headers),
+            _callSiteFetch: ctx._callSiteFetch,
+            fetch: ctx._callSiteFetch ?? userCtx.fetch ?? ctx.fetch,
+            result: userCtx.result !== void 0 ? userCtx.result : userCtx instanceof Response ? userCtx : ctx.result,
+            error: userCtx.error ?? ctx.error
+          });
+          if (result2.error) throw result2.error;
+          return result2;
+        };
+        const result = await middlewareFn({
+          ...ctx,
+          next: userNext
+        });
+        if (isRedirect(result)) return {
+          ...ctx,
+          error: result
+        };
+        if (result instanceof Response) return {
+          ...ctx,
+          result
+        };
+        if (!result) throw new Error("User middleware returned undefined. You must call next() or return a result in your middlewares.");
+        return result;
+      }
+      return callNextMiddleware(ctx);
+    } catch (error) {
+      return {
+        ...ctx,
+        error
+      };
+    }
+  };
+  return callNextMiddleware({
+    ...opts,
+    headers: opts.headers || {},
+    sendContext: opts.sendContext || {},
+    context: opts.context || createNullProtoObject(),
+    _callSiteFetch: opts.fetch
+  });
+}
 function flattenMiddlewares(middlewares, maxDepth = 100) {
   const seen = /* @__PURE__ */ new Set();
   const flattened = [];
@@ -185,6 +331,40 @@ function flattenMiddlewares(middlewares, maxDepth = 100) {
   };
   recurse(middlewares, 0);
   return flattened;
+}
+async function execValidator(validator, input) {
+  if (validator == null) return {};
+  if ("~standard" in validator) {
+    const result = await validator["~standard"].validate(input);
+    if (result.issues) throw new Error(JSON.stringify(result.issues, void 0, 2));
+    return result.value;
+  }
+  if ("parse" in validator) return validator.parse(input);
+  if (typeof validator === "function") return validator(input);
+  throw new Error("Invalid validator type!");
+}
+function serverFnBaseToMiddleware(options) {
+  return {
+    "~types": void 0,
+    options: {
+      inputValidator: options.inputValidator,
+      client: async ({ next, sendContext, fetch: fetch2, ...ctx }) => {
+        const payload = {
+          ...ctx,
+          context: sendContext,
+          fetch: fetch2
+        };
+        return next(await options.extractedFn?.(payload));
+      },
+      server: async ({ next, ...ctx }) => {
+        const result = await options.serverFn?.(ctx);
+        return next({
+          ...ctx,
+          result
+        });
+      }
+    }
+  };
 }
 function getDefaultSerovalPlugins() {
   return [...getStartOptions()?.serializationAdapters?.map(makeSerovalPlugin) ?? [], ...defaultSerovalPlugins];
@@ -687,7 +867,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./router-5nJVlaUk.mjs"),
+    import("./router-Bl5Ot07t.mjs"),
     import("./start-HYkvq4Ni.mjs"),
     import("../__23tanstack-start-plugin-adapters-Cwee5PKy.mjs")
   ]);
@@ -1009,6 +1189,9 @@ function createServerEntry(entry) {
 }
 const server = createServerEntry({ fetch });
 export {
+  TSS_SERVER_FUNCTION as T,
+  createServerFn as c,
   createServerEntry,
-  server as default
+  server as default,
+  getServerFnById as g
 };

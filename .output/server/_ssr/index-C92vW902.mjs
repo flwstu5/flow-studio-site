@@ -1,5 +1,52 @@
 import { r as reactExports, j as jsxRuntimeExports } from "../_libs/react.mjs";
+import { c as createServerFn, T as TSS_SERVER_FUNCTION, g as getServerFnById } from "./index.mjs";
+import "../_libs/seroval.mjs";
 import { A as ArrowRight, X, M as Menu, a as ArrowDownRight, C as Check } from "../_libs/lucide-react.mjs";
+import { o as object, s as string } from "../_libs/zod.mjs";
+import "node:async_hooks";
+import "../_libs/h3-v2.mjs";
+import "../_libs/rou3.mjs";
+import "../_libs/srvx.mjs";
+import "node:http";
+import "node:stream";
+import "node:stream/promises";
+import "node:https";
+import "node:http2";
+import "../_libs/tanstack__router-core.mjs";
+import "../_libs/tanstack__history.mjs";
+import "../_libs/cookie-es.mjs";
+import "../_libs/seroval-plugins.mjs";
+import "node:stream/web";
+import "../_libs/tanstack__react-router.mjs";
+import "../_libs/react-dom.mjs";
+import "util";
+import "crypto";
+import "async_hooks";
+import "stream";
+import "../_libs/isbot.mjs";
+var createSsrRpc = (functionId) => {
+  const url = "/_serverFn/" + functionId;
+  const serverFnMeta = { id: functionId };
+  const fn = async (...args) => {
+    return (await getServerFnById(functionId))(...args);
+  };
+  return Object.assign(fn, {
+    url,
+    serverFnMeta,
+    [TSS_SERVER_FUNCTION]: true
+  });
+};
+const IntakeSchema = object({
+  name: string().min(1),
+  business: string().min(1),
+  serviceType: string().min(1),
+  budget: string().min(1),
+  message: string().min(1),
+  email: string().email()
+});
+const submitIntake = createServerFn({
+  method: "POST"
+}).inputValidator(IntakeSchema).handler(createSsrRpc("dbc5c64a72e5c37ef7dda6c1e8151a7452ac6a6525097c03d85e5c944a253eac"));
 const services = [{
   title: "Digital & print graphics",
   text: "Social sets, ads, packaging, and signage — designed for the format it ships in.",
@@ -26,7 +73,8 @@ const plans = [{
   price: "99",
   description: "Best for small businesses that post occasionally.",
   features: ["2 digital flyers per month", "1 revision per flyer", "48–72 hour turnaround", "Instagram + Facebook sizes"],
-  color: "dark"
+  color: "dark",
+  checkoutUrl: "https://buy.stripe.com/9B6cN40NN0CSg1Q16c9sk00"
 }, {
   name: "Growth",
   note: "Best value",
@@ -34,13 +82,15 @@ const plans = [{
   description: "Content-ready, with something new to post every week.",
   features: ["4 digital flyers per month", "2 revisions per flyer", "All social media sizes", "Priority turnaround", "Basic captions included"],
   color: "mid",
-  featured: true
+  featured: true,
+  checkoutUrl: "https://buy.stripe.com/9B68wObsrbhwcPE5ms9sk01"
 }, {
   name: "Premium",
   price: "300",
   description: "For brands that need a consistent marketing rhythm.",
   features: ["8 digital flyers per month", "2 revisions per flyer", "Multiple platform sizes", "Priority turnaround", "Captions + promo wording", "1 animated flyer monthly"],
-  color: "light"
+  color: "light",
+  checkoutUrl: "https://buy.stripe.com/3cIfZg2VV1GWg1Q0289sk02"
 }];
 const steps = [["Subscribe", "Pick a plan. No contracts — pause or cancel whenever the calendar gets quiet."], ["Submit a request", "Drop your flyer brief into the queue: event, promotion, menu, or announcement."], ["Get a draft", "A considered, on-brand design lands back in your inbox, ready to review."], ["Revise & ship", "Request changes if needed, then download polished print- and web-ready files."]];
 function RegMark({
@@ -53,6 +103,33 @@ function RegMark({
 }
 function FlowStudio() {
   const [menuOpen, setMenuOpen] = reactExports.useState(false);
+  const [intakeForm, setIntakeForm] = reactExports.useState({
+    name: "",
+    email: "",
+    business: "",
+    serviceType: "Logo & brand design",
+    budget: "",
+    message: ""
+  });
+  const [intakeStatus, setIntakeStatus] = reactExports.useState("idle");
+  function updateIntakeField(field, value) {
+    setIntakeForm((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+  }
+  async function handleIntakeSubmit(e) {
+    e.preventDefault();
+    setIntakeStatus("sending");
+    try {
+      await submitIntake({
+        data: intakeForm
+      });
+      setIntakeStatus("sent");
+    } catch {
+      setIntakeStatus("error");
+    }
+  }
   reactExports.useEffect(() => {
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), {
       threshold: 0.12
@@ -78,7 +155,7 @@ function FlowStudio() {
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#how", children: "How it works" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#work", children: "Work" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "nav-login", href: "https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login", children: "Client login" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { className: "nav-cta", href: "mailto:hello@flowstudio.design?subject=New%20project%20brief", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { className: "nav-cta", href: "#intake", children: [
             "Start a project ",
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 14 })
           ] })
@@ -91,7 +168,7 @@ function FlowStudio() {
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#how", onClick: closeMenu, children: "How it works" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#work", onClick: closeMenu, children: "Work" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login", onClick: closeMenu, children: "Client login" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "mailto:hello@flowstudio.design?subject=New%20project%20brief", onClick: closeMenu, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "#intake", onClick: closeMenu, children: [
           "Start a project ",
           /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 16 })
         ] })
@@ -141,7 +218,7 @@ function FlowStudio() {
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hero-copy", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Full-service graphic design for logos, brand identity, and websites — with a flyer subscription that keeps fresh work landing every month, no re-briefing required." }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "button-row", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "mailto:hello@flowstudio.design?subject=New%20project%20brief", className: "button button-solid", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "#intake", className: "button button-solid", children: [
               "Start a project ",
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDownRight, { size: 18 })
             ] }),
@@ -204,7 +281,7 @@ function FlowStudio() {
           /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { size: 15 }),
           feature
         ] }, feature)) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: `mailto:hello@flowstudio.design?subject=${plan.name}%20flyer%20plan`, className: `button ${plan.featured ? "button-paper" : "button-outline"}`, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: plan.checkoutUrl, className: `button ${plan.featured ? "button-paper" : "button-outline"}`, children: [
           "Choose ",
           plan.name,
           /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 16 })
@@ -332,17 +409,45 @@ function FlowStudio() {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "display", children: [
         "Tell us what",
         /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-        "you’re building",
+        "you're building",
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "." })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "One-off project or ongoing flyers — either way, it starts with a short brief and an honest conversation." }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "button-row centered", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "mailto:hello@flowstudio.design?subject=New%20project%20brief", className: "button button-solid", children: [
-          "Submit a project brief ",
+      intakeStatus === "sent" ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
+        marginTop: 24,
+        fontWeight: 600
+      }, children: "Got it — thanks! We'll be in touch shortly." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleIntakeSubmit, style: {
+        display: "grid",
+        gap: 14,
+        maxWidth: 480,
+        margin: "28px auto 0",
+        textAlign: "left"
+      }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Your name", value: intakeForm.name, onChange: (e) => updateIntakeField("name", e.target.value) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, type: "email", placeholder: "Email address", value: intakeForm.email, onChange: (e) => updateIntakeField("email", e.target.value) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Business / brand name", value: intakeForm.business, onChange: (e) => updateIntakeField("business", e.target.value) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("select", { value: intakeForm.serviceType, onChange: (e) => updateIntakeField("serviceType", e.target.value), children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { children: "Logo & brand design" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { children: "Website design & dev" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { children: "Digital & print graphics" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { children: "Flyer subscription" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { children: "Something else" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Budget range (e.g. $500–1000)", value: intakeForm.budget, onChange: (e) => updateIntakeField("budget", e.target.value) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("textarea", { required: true, rows: 4, placeholder: "Tell us about the project", value: intakeForm.message, onChange: (e) => updateIntakeField("message", e.target.value) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "submit", className: "button button-solid", disabled: intakeStatus === "sending", children: [
+          intakeStatus === "sending" ? "Sending…" : "Submit project brief",
+          " ",
           /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 17 })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", className: "button button-outline", children: "View flyer plans" })
-      ] })
+        intakeStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
+          color: "#a31e22",
+          fontSize: 13
+        }, children: "Something went wrong sending that — try again, or email hello@flowstudio.design directly." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "button-row centered", style: {
+        marginTop: 20
+      }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", className: "button button-outline", children: "View flyer plans" }) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("footer", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap footer-inner", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { className: "logo footer-logo", href: "#top", children: [

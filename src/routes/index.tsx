@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowDownRight, ArrowRight, Check, Menu, X } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
+import { submitIntake } from '../server/intake'
 
 export const Route = createFileRoute('/')({
   component: FlowStudio,
@@ -80,6 +81,30 @@ function RegMark({ position }: { position: string }) {
 
 function FlowStudio() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [intakeForm, setIntakeForm] = useState({
+    name: '',
+    email: '',
+    business: '',
+    serviceType: 'Logo & brand design',
+    budget: '',
+    message: '',
+  })
+  const [intakeStatus, setIntakeStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  function updateIntakeField(field: string, value: string) {
+    setIntakeForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  async function handleIntakeSubmit(e: FormEvent) {
+    e.preventDefault()
+    setIntakeStatus('sending')
+    try {
+      await submitIntake({ data: intakeForm })
+      setIntakeStatus('sent')
+    } catch {
+      setIntakeStatus('error')
+    }
+  }
 
   useEffect(() => {
     const reveal = new IntersectionObserver(
@@ -106,7 +131,7 @@ function FlowStudio() {
             <a href="#how">How it works</a>
             <a href="#work">Work</a>
             <a className="nav-login" href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Client login</a>
-            <a className="nav-cta" href="mailto:hello@flowstudio.design?subject=New%20project%20brief">Start a project <ArrowRight size={14} /></a>
+            <a className="nav-cta" href="#intake">Start a project <ArrowRight size={14} /></a>
           </nav>
           <button className="menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">
             {menuOpen ? <X /> : <Menu />}
@@ -118,7 +143,7 @@ function FlowStudio() {
           <a href="#how" onClick={closeMenu}>How it works</a>
           <a href="#work" onClick={closeMenu}>Work</a>
           <a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login" onClick={closeMenu}>Client login</a>
-          <a href="mailto:hello@flowstudio.design?subject=New%20project%20brief" onClick={closeMenu}>Start a project <ArrowRight size={16} /></a>
+          <a href="#intake" onClick={closeMenu}>Start a project <ArrowRight size={16} /></a>
         </nav>
       </header>
 
@@ -142,7 +167,7 @@ function FlowStudio() {
               <div className="hero-copy">
                 <p>Full-service graphic design for logos, brand identity, and websites — with a flyer subscription that keeps fresh work landing every month, no re-briefing required.</p>
                 <div className="button-row">
-                  <a href="mailto:hello@flowstudio.design?subject=New%20project%20brief" className="button button-solid">Start a project <ArrowDownRight size={18} /></a>
+                  <a href="#intake" className="button button-solid">Start a project <ArrowDownRight size={18} /></a>
                   <a href="#subscription" className="button button-outline">See flyer plans</a>
                 </div>
               </div>
@@ -253,10 +278,72 @@ function FlowStudio() {
           <div className="cta-proof">
             <RegMark position="tl" /><RegMark position="tr" /><RegMark position="bl" /><RegMark position="br" />
             <p className="section-label mono">Start here / New business</p>
-            <h2 className="display">Tell us what<br />you’re building<span>.</span></h2>
+            <h2 className="display">Tell us what<br />you're building<span>.</span></h2>
             <p>One-off project or ongoing flyers — either way, it starts with a short brief and an honest conversation.</p>
-            <div className="button-row centered">
-              <a href="mailto:hello@flowstudio.design?subject=New%20project%20brief" className="button button-solid">Submit a project brief <ArrowRight size={17} /></a>
+
+            {intakeStatus === 'sent' ? (
+              <p style={{ marginTop: 24, fontWeight: 600 }}>
+                Got it — thanks! We'll be in touch shortly.
+              </p>
+            ) : (
+              <form
+                onSubmit={handleIntakeSubmit}
+                style={{ display: 'grid', gap: 14, maxWidth: 480, margin: '28px auto 0', textAlign: 'left' }}
+              >
+                <input
+                  required
+                  placeholder="Your name"
+                  value={intakeForm.name}
+                  onChange={(e) => updateIntakeField('name', e.target.value)}
+                />
+                <input
+                  required
+                  type="email"
+                  placeholder="Email address"
+                  value={intakeForm.email}
+                  onChange={(e) => updateIntakeField('email', e.target.value)}
+                />
+                <input
+                  required
+                  placeholder="Business / brand name"
+                  value={intakeForm.business}
+                  onChange={(e) => updateIntakeField('business', e.target.value)}
+                />
+                <select
+                  value={intakeForm.serviceType}
+                  onChange={(e) => updateIntakeField('serviceType', e.target.value)}
+                >
+                  <option>Logo & brand design</option>
+                  <option>Website design & dev</option>
+                  <option>Digital & print graphics</option>
+                  <option>Flyer subscription</option>
+                  <option>Something else</option>
+                </select>
+                <input
+                  required
+                  placeholder="Budget range (e.g. $500–1000)"
+                  value={intakeForm.budget}
+                  onChange={(e) => updateIntakeField('budget', e.target.value)}
+                />
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Tell us about the project"
+                  value={intakeForm.message}
+                  onChange={(e) => updateIntakeField('message', e.target.value)}
+                />
+                <button type="submit" className="button button-solid" disabled={intakeStatus === 'sending'}>
+                  {intakeStatus === 'sending' ? 'Sending…' : 'Submit project brief'} <ArrowRight size={17} />
+                </button>
+                {intakeStatus === 'error' && (
+                  <p style={{ color: '#a31e22', fontSize: 13 }}>
+                    Something went wrong sending that — try again, or email hello@flowstudio.design directly.
+                  </p>
+                )}
+              </form>
+            )}
+
+            <div className="button-row centered" style={{ marginTop: 20 }}>
               <a href="#subscription" className="button button-outline">View flyer plans</a>
             </div>
           </div>
