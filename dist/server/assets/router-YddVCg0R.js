@@ -1,0 +1,52 @@
+import { createRootRoute, HeadContent, Scripts, createFileRoute, lazyRouteComponent, createRouter } from "@tanstack/react-router";
+import { jsxs, jsx } from "react/jsx-runtime";
+const Route$1 = createRootRoute({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "Flow Studio — Design, On Press" },
+      { name: "description", content: "Independent graphic design studio for brand identity, websites, print, and recurring flyer design." },
+      { name: "theme-color", content: "#f4f0e7" }
+    ],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" }
+    ]
+  }),
+  shellComponent: RootDocument
+});
+function RootDocument({ children }) {
+  return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
+    /* @__PURE__ */ jsx("head", { children: /* @__PURE__ */ jsx(HeadContent, {}) }),
+    /* @__PURE__ */ jsxs("body", { children: [
+      children,
+      /* @__PURE__ */ jsx(Scripts, {})
+    ] })
+  ] });
+}
+const $$splitComponentImporter = () => import("./index-with-bordered-logo-DYiKxvDF.js");
+const Route = createFileRoute("/index-with-bordered-logo")({
+  component: lazyRouteComponent($$splitComponentImporter, "component")
+});
+const IndexWithBorderedLogoRoute = Route.update({
+  id: "/index-with-bordered-logo",
+  path: "/index-with-bordered-logo",
+  getParentRoute: () => Route$1
+});
+const rootRouteChildren = {
+  IndexWithBorderedLogoRoute
+};
+const routeTree = Route$1._addFileChildren(rootRouteChildren)._addFileTypes();
+const getRouter = () => {
+  const router = createRouter({
+    routeTree,
+    scrollRestoration: true,
+    defaultPreloadStaleTime: 0
+  });
+  return router;
+};
+export {
+  getRouter
+};
