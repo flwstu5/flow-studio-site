@@ -40,6 +40,7 @@ const plans = [
     description: 'Best for small businesses that post occasionally.',
     features: ['2 digital flyers per month', '1 revision per flyer', '48–72 hour turnaround', 'Instagram + Facebook sizes'],
     color: 'dark',
+    checkoutUrl: 'https://buy.stripe.com/9B6cN40NN0CSg1Q16c9sk00',
   },
   {
     name: 'Growth',
@@ -49,6 +50,7 @@ const plans = [
     features: ['4 digital flyers per month', '2 revisions per flyer', 'All social media sizes', 'Priority turnaround', 'Basic captions included'],
     color: 'mid',
     featured: true,
+    checkoutUrl: 'https://buy.stripe.com/9B68wObsrbhwcPE5ms9sk01',
   },
   {
     name: 'Premium',
@@ -56,6 +58,7 @@ const plans = [
     description: 'For brands that need a consistent marketing rhythm.',
     features: ['8 digital flyers per month', '2 revisions per flyer', 'Multiple platform sizes', 'Priority turnaround', 'Captions + promo wording', '1 animated flyer monthly'],
     color: 'light',
+    checkoutUrl: 'https://buy.stripe.com/3cIfZg2VV1GWg1Q0289sk02',
   },
 ]
 
@@ -188,7 +191,7 @@ function FlowStudio() {
                 <ul>
                   {plan.features.map((feature) => <li key={feature}><Check size={15} />{feature}</li>)}
                 </ul>
-                <a href={`mailto:hello@flowstudio.design?subject=${plan.name}%20flyer%20plan`} className={`button ${plan.featured ? 'button-paper' : 'button-outline'}`}>Choose {plan.name}<ArrowRight size={16} /></a>
+                <a href={plan.checkoutUrl} className={`button ${plan.featured ? 'button-paper' : 'button-outline'}`}>Choose {plan.name}<ArrowRight size={16} /></a>
               </article>
             ))}
           </div>
