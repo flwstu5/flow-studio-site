@@ -20,28 +20,28 @@ const assets = {
   "/favicon.ico": {
     "type": "image/vnd.microsoft.icon",
     "etag": '"3aee-JckObXLTAe3A6+myIgdybrrPxqQ"',
-    "mtime": "2026-07-14T22:56:58.487Z",
+    "mtime": "2026-07-14T23:57:24.610Z",
     "size": 15086,
     "path": "../public/favicon.ico"
   },
   "/assets/index-BIeakczg.css": {
     "type": "text/css; charset=utf-8",
     "etag": '"5673-8ypnIcPw0ktd0UminjYFPNxPngk"',
-    "mtime": "2026-07-14T22:56:58.217Z",
+    "mtime": "2026-07-14T23:57:24.199Z",
     "size": 22131,
     "path": "../public/assets/index-BIeakczg.css"
   },
   "/assets/index-C5bCcFgQ.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": '"4fe2-bFcWaeqYO499B/4LMmiEQg8PEto"',
-    "mtime": "2026-07-14T22:56:58.217Z",
+    "mtime": "2026-07-14T23:57:24.199Z",
     "size": 20450,
     "path": "../public/assets/index-C5bCcFgQ.js"
   },
   "/assets/index-BKFoGEbW.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": '"4e7ee-XHdwUwSk1Mnyfb5DO9sJuLD4ymw"',
-    "mtime": "2026-07-14T22:56:58.217Z",
+    "mtime": "2026-07-14T23:57:24.199Z",
     "size": 321518,
     "path": "../public/assets/index-BKFoGEbW.js"
   }
