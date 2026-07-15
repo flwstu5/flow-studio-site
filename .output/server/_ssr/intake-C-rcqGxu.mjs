@@ -101,44 +101,52 @@ const submitIntake = createServerFn({
       <p>${data.message.replace(/\n/g, "<br />")}</p>
     `;
   await sendEmail({
-    to: "hello@flowstudio.design",
+    to: "denzaylewilliams@gmail.com",
     replyTo: data.email,
     subject: `New project brief — ${data.serviceType}`,
     html: briefHtml
   });
-  const supabase = getAdminClient();
-  const {
-    data: existing
-  } = await supabase.from("clients").select("id").eq("email", data.email).maybeSingle();
-  if (!existing) {
+  try {
+    const supabase = getAdminClient();
     const {
-      data: created,
-      error: createError
-    } = await supabase.auth.admin.createUser({
-      email: data.email,
-      email_confirm: true
-    });
-    if (createError) {
-      console.error("Failed to create portal account:", createError.message);
-    } else {
-      await supabase.from("clients").insert({
-        auth_user_id: created.user.id,
+      data: existing
+    } = await supabase.from("clients").select("id").eq("email", data.email).maybeSingle();
+    if (!existing) {
+      const {
+        data: created,
+        error: createError
+      } = await supabase.auth.admin.createUser({
         email: data.email,
-        business_name: data.business,
-        client_type: "project",
-        tier: null
+        email_confirm: true
       });
-      await sendEmail({
-        to: data.email,
-        subject: "Your Flow Studio client portal is ready",
-        html: `
-            <h2>Thanks, ${data.name}!</h2>
-            <p>We received your project brief and will be in touch shortly.</p>
-            <p>You also now have access to your client portal, where you'll be able to track this project and any files we send your way.</p>
-            <p><a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Log in here</a> using this email address (${data.email}) — you'll receive a one-time code, no password needed.</p>
-          `
-      });
+      if (createError) {
+        console.error("Failed to create portal account:", createError.message);
+      } else {
+        await supabase.from("clients").insert({
+          auth_user_id: created.user.id,
+          email: data.email,
+          business_name: data.business,
+          client_type: "project",
+          tier: null
+        });
+        try {
+          await sendEmail({
+            to: data.email,
+            subject: "Your Flow Studio client portal is ready",
+            html: `
+                <h2>Thanks, ${data.name}!</h2>
+                <p>We received your project brief and will be in touch shortly.</p>
+                <p>You also now have access to your client portal, where you'll be able to track this project and any files we send your way.</p>
+                <p><a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Log in here</a> using this email address (${data.email}) — you'll receive a one-time code, no password needed.</p>
+              `
+          });
+        } catch (welcomeEmailError) {
+          console.error("Welcome email not sent (expected until domain verified):", welcomeEmailError);
+        }
+      }
     }
+  } catch (accountError) {
+    console.error("Portal account creation step failed:", accountError);
   }
   return {
     success: true

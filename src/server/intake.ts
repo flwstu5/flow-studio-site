@@ -49,7 +49,11 @@ async function sendEmail(params: { to: string; replyTo?: string; subject: string
 export const submitIntake = createServerFn({ method: 'POST' })
   .inputValidator(IntakeSchema)
   .handler(async ({ data }) => {
-    // 1. Email Flow Studio with the full brief, as before.
+    // 1. Email you the full brief. This MUST succeed for the submission to
+    // count as successful — it's the actual lead notification.
+    // NOTE: using your personal email here since hello@flowstudio.design
+    // isn't a real inbox yet. Update this once you have a verified domain
+    // and a real business inbox set up.
     const briefHtml = `
       <h2>New project brief</h2>
       <p><strong>Name:</strong> ${data.name}</p>
@@ -61,52 +65,64 @@ export const submitIntake = createServerFn({ method: 'POST' })
       <p>${data.message.replace(/\n/g, '<br />')}</p>
     `
     await sendEmail({
-      to: 'hello@flowstudio.design',
+      to: 'denzaylewilliams@gmail.com',
       replyTo: data.email,
       subject: `New project brief — ${data.serviceType}`,
       html: briefHtml,
     })
 
     // 2. Create their portal account, same as subscribers get automatically.
-    const supabase = getAdminClient()
+    // Wrapped so that any failure here (including the welcome email below,
+    // which will currently fail for anyone but your own Resend-registered
+    // address until a domain is verified) doesn't break the submission —
+    // the lead notification above already succeeded, so nothing is lost.
+    try {
+      const supabase = getAdminClient()
 
-    const { data: existing } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('email', data.email)
-      .maybeSingle()
+      const { data: existing } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('email', data.email)
+        .maybeSingle()
 
-    if (!existing) {
-      const { data: created, error: createError } = await supabase.auth.admin.createUser({
-        email: data.email,
-        email_confirm: true,
-      })
-
-      if (createError) {
-        // Don't fail the whole submission if account creation has an issue —
-        // the brief email above already went through, so the lead isn't lost.
-        console.error('Failed to create portal account:', createError.message)
-      } else {
-        await supabase.from('clients').insert({
-          auth_user_id: created.user.id,
+      if (!existing) {
+        const { data: created, error: createError } = await supabase.auth.admin.createUser({
           email: data.email,
-          business_name: data.business,
-          client_type: 'project',
-          tier: null,
+          email_confirm: true,
         })
 
-        // 3. Welcome email to the client with their portal login info.
-        await sendEmail({
-          to: data.email,
-          subject: 'Your Flow Studio client portal is ready',
-          html: `
-            <h2>Thanks, ${data.name}!</h2>
-            <p>We received your project brief and will be in touch shortly.</p>
-            <p>You also now have access to your client portal, where you'll be able to track this project and any files we send your way.</p>
-            <p><a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Log in here</a> using this email address (${data.email}) — you'll receive a one-time code, no password needed.</p>
-          `,
-        })
+        if (createError) {
+          console.error('Failed to create portal account:', createError.message)
+        } else {
+          await supabase.from('clients').insert({
+            auth_user_id: created.user.id,
+            email: data.email,
+            business_name: data.business,
+            client_type: 'project',
+            tier: null,
+          })
+
+          // Welcome email to the client — will currently fail for any email
+          // other than your own until a domain is verified in Resend. That's
+          // expected and caught below, not a bug.
+          try {
+            await sendEmail({
+              to: data.email,
+              subject: 'Your Flow Studio client portal is ready',
+              html: `
+                <h2>Thanks, ${data.name}!</h2>
+                <p>We received your project brief and will be in touch shortly.</p>
+                <p>You also now have access to your client portal, where you'll be able to track this project and any files we send your way.</p>
+                <p><a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Log in here</a> using this email address (${data.email}) — you'll receive a one-time code, no password needed.</p>
+              `,
+            })
+          } catch (welcomeEmailError) {
+            console.error('Welcome email not sent (expected until domain verified):', welcomeEmailError)
+          }
+        }
       }
+    } catch (accountError) {
+      console.error('Portal account creation step failed:', accountError)
     }
 
     return { success: true }
