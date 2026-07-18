@@ -53,14 +53,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 }
 .nav-inner { height: 76px; display: flex; align-items: center; justify-content: space-between; }
 .logo { display: inline-flex; align-items: center; gap: 13px; text-decoration: none; }
-.logo-bordered { border: 2px solid var(--red-dark); border-radius: 6px; padding: 9px 16px; }
+.logo-bordered { border: 0px solid var(--red-dark); border-radius: 0px; padding: 0px 0px; }
 .logo .display { font-size: 15px; letter-spacing: -.02em; }
 .ink-dots { display: flex; }
 .ink-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--red-dark); margin-left: -2px; }
 .ink-dots i:nth-child(2) { background: var(--red-mid); }
 .ink-dots i:nth-child(3) { background: var(--red-light); }
 .ink-dots i:nth-child(3) { background: var(--red-light); }
-.logo-image { height: 40px; width: auto; display: block; }
+.logo-image { height: 64px; width: auto; display: block; }
 .desktop-nav { display: flex; align-items: center; gap: 31px; }
 .desktop-nav > a { font-size: 13px; font-weight: 700; text-decoration: none; color: var(--ink-soft); transition: color .2s ease; }
 .desktop-nav > a:hover { color: var(--ink); }
@@ -190,7 +190,7 @@ footer { border-top: 1px solid var(--line); padding: 35px 0; }
 .footer-email { text-decoration: none; }
 .footer-email:hover { color: var(--red-dark); }
 .footer-email:hover { color: var(--red-dark); }
-.footer-logo .logo-image { height: 32px; }
+.footer-logo .logo-image { height: 44px; }
 
 .hero-enter { animation: press-in .8s cubic-bezier(.2,.8,.2,1) both; }
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
