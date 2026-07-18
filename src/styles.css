@@ -60,7 +60,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .ink-dots i:nth-child(2) { background: var(--red-mid); }
 .ink-dots i:nth-child(3) { background: var(--red-light); }
 .ink-dots i:nth-child(3) { background: var(--red-light); }
-.logo-image { height: 84px; width: auto; display: block; }
+.logo-image { height: 104px; width: auto; display: block; }
 .desktop-nav { display: flex; align-items: center; gap: 31px; }
 .desktop-nav > a { font-size: 13px; font-weight: 700; text-decoration: none; color: var(--ink-soft); transition: color .2s ease; }
 .desktop-nav > a:hover { color: var(--ink); }
@@ -190,7 +190,7 @@ footer { border-top: 1px solid var(--line); padding: 35px 0; }
 .footer-email { text-decoration: none; }
 .footer-email:hover { color: var(--red-dark); }
 .footer-email:hover { color: var(--red-dark); }
-.footer-logo .logo-image { height: 64px; }
+.footer-logo .logo-image { height: 84px; }
 
 .hero-enter { animation: press-in .8s cubic-bezier(.2,.8,.2,1) both; }
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
