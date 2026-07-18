@@ -190,7 +190,7 @@ footer { border-top: 1px solid var(--line); padding: 35px 0; }
 .footer-email { text-decoration: none; }
 .footer-email:hover { color: var(--red-dark); }
 .footer-email:hover { color: var(--red-dark); }
-.footer-logo .logo-image { height: 44px; }
+.footer-logo .logo-image { height: 64px; }
 
 .hero-enter { animation: press-in .8s cubic-bezier(.2,.8,.2,1) both; }
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
