@@ -355,7 +355,7 @@ function FlowStudio() {
             <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
           </a>
           <span className="mono">Independent design studio / © 2026</span>
-          <a className="mono footer-email" href="mailto:email@flowstudiogrfx.com">hello@flowstudio.design</a>
+          <a className="mono footer-email" href="mailto:email@flowstudiogrfx.com">email@flowstudiogrfx.com</a>
         </div>
       </footer>
     </main>
