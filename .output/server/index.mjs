@@ -17,33 +17,33 @@ const headers = ((m) => function headersRouteRule(event) {
   }
 });
 const assets = {
-  "/favicon.ico": {
-    "type": "image/vnd.microsoft.icon",
-    "etag": '"3aee-JckObXLTAe3A6+myIgdybrrPxqQ"',
-    "mtime": "2026-07-15T00:56:27.521Z",
-    "size": 15086,
-    "path": "../public/favicon.ico"
-  },
   "/assets/index-BIeakczg.css": {
     "type": "text/css; charset=utf-8",
     "etag": '"5673-8ypnIcPw0ktd0UminjYFPNxPngk"',
-    "mtime": "2026-07-15T00:56:27.211Z",
+    "mtime": "2026-07-18T19:31:47.069Z",
     "size": 22131,
     "path": "../public/assets/index-BIeakczg.css"
   },
-  "/assets/index-C5bCcFgQ.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"4fe2-bFcWaeqYO499B/4LMmiEQg8PEto"',
-    "mtime": "2026-07-15T00:56:27.211Z",
-    "size": 20450,
-    "path": "../public/assets/index-C5bCcFgQ.js"
+  "/logo-icon.png": {
+    "type": "image/png",
+    "etag": '"1f5f2-vAedS636f88Q7N1lDfub7c1hBG8"',
+    "mtime": "2026-07-18T19:31:47.881Z",
+    "size": 128498,
+    "path": "../public/logo-icon.png"
   },
   "/assets/index-BKFoGEbW.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": '"4e7ee-XHdwUwSk1Mnyfb5DO9sJuLD4ymw"',
-    "mtime": "2026-07-15T00:56:27.211Z",
+    "mtime": "2026-07-18T19:31:47.069Z",
     "size": 321518,
     "path": "../public/assets/index-BKFoGEbW.js"
+  },
+  "/assets/index-C5bCcFgQ.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"4fe2-bFcWaeqYO499B/4LMmiEQg8PEto"',
+    "mtime": "2026-07-18T19:31:47.069Z",
+    "size": 20450,
+    "path": "../public/assets/index-C5bCcFgQ.js"
   }
 };
 function readAsset(id) {
