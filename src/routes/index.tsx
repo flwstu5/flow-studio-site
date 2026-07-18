@@ -122,8 +122,7 @@ function FlowStudio() {
       <header className="site-header">
         <div className="wrap nav-inner">
           <a className="logo logo-bordered" href="#top" aria-label="Flow Studio home" onClick={closeMenu}>
-            <span className="display">Flow Studio</span>
-            <span className="ink-dots" aria-hidden="true"><i /><i /><i /></span>
+            <img src="/logo-icon.png" alt="Flow Studio" className="logo-image" />
           </a>
           <nav className="desktop-nav" aria-label="Primary navigation">
             <a href="#services">Services</a>
@@ -352,9 +351,11 @@ function FlowStudio() {
 
       <footer>
         <div className="wrap footer-inner">
-          <a className="logo footer-logo" href="#top"><span className="display">Flow Studio</span><span className="ink-dots"><i /><i /><i /></span></a>
+          <a className="logo footer-logo" href="#top">
+            <img src="/logo-icon.png" alt="Flow Studio" className="logo-image" />
+          </a>
           <span className="mono">Independent design studio / © 2026</span>
-          <a className="mono footer-email" href="mailto:hello@flowstudio.design">hello@flowstudio.design</a>
+          <a className="mono footer-email" href="mailto:email@flowstudiogrfx.com">hello@flowstudio.design</a>
         </div>
       </footer>
     </main>

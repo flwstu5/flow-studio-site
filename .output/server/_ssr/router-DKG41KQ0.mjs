@@ -39,7 +39,7 @@ function RootDocument({ children }) {
     ] })
   ] });
 }
-const $$splitComponentImporter = () => import("./index-C92vW902.mjs");
+const $$splitComponentImporter = () => import("./index-BumZf6tX.mjs");
 const Route = createFileRoute("/")({
   component: lazyRouteComponent($$splitComponentImporter, "component")
 });

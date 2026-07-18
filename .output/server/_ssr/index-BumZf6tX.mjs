@@ -141,14 +141,7 @@ function FlowStudio() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("main", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "site-header", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap nav-inner", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { className: "logo logo-bordered", href: "#top", "aria-label": "Flow Studio home", onClick: closeMenu, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "display", children: "Flow Studio" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ink-dots", "aria-hidden": "true", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("i", {}),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("i", {}),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("i", {})
-          ] })
-        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo logo-bordered", href: "#top", "aria-label": "Flow Studio home", onClick: closeMenu, children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-icon.png", alt: "Flow Studio", className: "logo-image" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "desktop-nav", "aria-label": "Primary navigation", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#services", children: "Services" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", children: "Flyer subscription" }),
@@ -450,16 +443,9 @@ function FlowStudio() {
       }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", className: "button button-outline", children: "View flyer plans" }) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("footer", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap footer-inner", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { className: "logo footer-logo", href: "#top", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "display", children: "Flow Studio" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ink-dots", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("i", {}),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("i", {}),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("i", {})
-        ] })
-      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo footer-logo", href: "#top", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-icon.png", alt: "Flow Studio", className: "logo-image" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mono", children: "Independent design studio / © 2026" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "mono footer-email", href: "mailto:hello@flowstudio.design", children: "hello@flowstudio.design" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "mono footer-email", href: "mailto:email@flowstudiogrfx.com", children: "hello@flowstudio.design" })
     ] }) })
   ] });
 }
