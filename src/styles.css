@@ -161,6 +161,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .website-grid .plan:not(.featured) li { color: #fff; }
 .website-grid .plan:not(.featured) .tear-line { border-color: #514e49; }
 .website-grid .plan:not(.featured) .button-outline { border-color: #fff; color: #fff; }
+.website-grid .plan:not(.featured) { background: #211f1d; border-color: #5b5752; }
 
 .hosting-block { margin-top: 20px; }
 .hosting-intro { margin: 0 0 28px; color: var(--ink-soft); font-size: 15px; max-width: 560px; }
