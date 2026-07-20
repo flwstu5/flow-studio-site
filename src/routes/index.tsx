@@ -55,7 +55,7 @@ const plans = [
   },
   {
     name: 'Premium',
-    price: '275',
+    price: '300',
     description: 'For brands that need a consistent marketing rhythm.',
     features: ['8 digital flyers per month', '2 revisions per flyer', 'Multiple platform sizes', 'Priority turnaround', 'Captions + promo wording', '1 animated flyer monthly'],
     color: 'light',
@@ -70,6 +70,7 @@ const websitePlans = [
     description: 'A clean, professional single-page site to get you online fast.',
     features: ['1-page custom layout', 'Mobile optimized', 'Contact form included', '1 week turnaround', '1 round of revisions'],
     color: 'dark',
+    checkoutUrl: 'https://buy.stripe.com/aFabJ0bsretI8zobKQ9sk03',
   },
   {
     name: 'Growth Site',
@@ -79,6 +80,7 @@ const websitePlans = [
     features: ['Up to 6 pages', 'Fully custom design', 'SEO setup included', '2 rounds of revisions', '2–3 week turnaround', '30 days of post-launch tweaks'],
     color: 'mid',
     featured: true,
+    checkoutUrl: 'https://buy.stripe.com/28E14m0NNgBQ5nc3ek9sk04',
   },
   {
     name: 'Full Custom Build',
@@ -123,8 +125,23 @@ function FlowStudio() {
   })
   const [intakeStatus, setIntakeStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
+  const [customForm, setCustomForm] = useState({
+    name: '',
+    email: '',
+    business: '',
+    currentSite: '',
+    goals: '',
+    budget: '',
+    timeline: '',
+  })
+  const [customStatus, setCustomStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
   function updateIntakeField(field: string, value: string) {
     setIntakeForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function updateCustomField(field: string, value: string) {
+    setCustomForm((prev) => ({ ...prev, [field]: value }))
   }
 
   async function handleIntakeSubmit(e: FormEvent) {
@@ -135,6 +152,26 @@ function FlowStudio() {
       setIntakeStatus('sent')
     } catch {
       setIntakeStatus('error')
+    }
+  }
+
+  async function handleCustomSubmit(e: FormEvent) {
+    e.preventDefault()
+    setCustomStatus('sending')
+    try {
+      await submitIntake({
+        data: {
+          name: customForm.name,
+          email: customForm.email,
+          business: customForm.business,
+          serviceType: 'Full Custom Website Build',
+          budget: customForm.budget,
+          message: `Current site: ${customForm.currentSite || 'None'}\nTimeline: ${customForm.timeline}\n\nGoals & why they need a full custom build:\n${customForm.goals}`,
+        },
+      })
+      setCustomStatus('sent')
+    } catch {
+      setCustomStatus('error')
     }
   }
 
@@ -281,7 +318,11 @@ function FlowStudio() {
                 <ul>
                   {plan.features.map((feature) => <li key={feature}><Check size={15} />{feature}</li>)}
                 </ul>
-                <a href="#intake" className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Get started<ArrowRight size={16} /></a>
+                {plan.checkoutUrl ? (
+                  <a href={plan.checkoutUrl} className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Get started<ArrowRight size={16} /></a>
+                ) : (
+                  <a href="#custom-build" className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Tell us about your project<ArrowRight size={16} /></a>
+                )}
               </article>
             ))}
           </div>
@@ -300,6 +341,40 @@ function FlowStudio() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="custom-build-form" id="custom-build">
+            <p className="section-label mono" style={{ marginTop: 70 }}>Full Custom Build / Project scoping</p>
+            <div className="section-heading">
+              <h2 className="display">Tell us what<br />you need built.</h2>
+              <p>Custom builds start with a conversation — walk us through your goals so we can scope it accurately.</p>
+            </div>
+
+            {customStatus === 'sent' ? (
+              <p style={{ fontWeight: 600 }}>Got it — thanks! We'll review your project and follow up shortly.</p>
+            ) : (
+              <form onSubmit={handleCustomSubmit} style={{ display: 'grid', gap: 14, maxWidth: 560 }}>
+                <input required placeholder="Your name" value={customForm.name} onChange={(e) => updateCustomField('name', e.target.value)} />
+                <input required type="email" placeholder="Email address" value={customForm.email} onChange={(e) => updateCustomField('email', e.target.value)} />
+                <input required placeholder="Business / brand name" value={customForm.business} onChange={(e) => updateCustomField('business', e.target.value)} />
+                <input placeholder="Current website (if any)" value={customForm.currentSite} onChange={(e) => updateCustomField('currentSite', e.target.value)} />
+                <input required placeholder="Ideal timeline (e.g. 6 weeks, flexible)" value={customForm.timeline} onChange={(e) => updateCustomField('timeline', e.target.value)} />
+                <input required placeholder="Budget range" value={customForm.budget} onChange={(e) => updateCustomField('budget', e.target.value)} />
+                <textarea
+                  required
+                  rows={5}
+                  placeholder="What are you building, and why does it need a full custom build? (integrations, animations, complex features, etc.)"
+                  value={customForm.goals}
+                  onChange={(e) => updateCustomField('goals', e.target.value)}
+                />
+                <button type="submit" className="button button-solid" disabled={customStatus === 'sending'}>
+                  {customStatus === 'sending' ? 'Sending…' : 'Submit project details'} <ArrowRight size={17} />
+                </button>
+                {customStatus === 'error' && (
+                  <p style={{ color: '#a31e22', fontSize: 13 }}>Something went wrong — try again, or email email@flowstudiogrfx.com directly.</p>
+                )}
+              </form>
+            )}
           </div>
         </div>
       </section>
