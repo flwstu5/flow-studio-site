@@ -92,6 +92,41 @@ const plans = [{
   color: "light",
   checkoutUrl: "https://buy.stripe.com/3cIfZg2VV1GWg1Q0289sk02"
 }];
+const websitePlans = [{
+  name: "Starter Site",
+  price: "900",
+  description: "A clean, professional single-page site to get you online fast.",
+  features: ["1-page custom layout", "Mobile optimized", "Contact form included", "1 week turnaround", "1 round of revisions"],
+  color: "dark"
+}, {
+  name: "Growth Site",
+  note: "Most popular",
+  price: "2,400",
+  description: "A full multi-page site built around your brand and services.",
+  features: ["Up to 6 pages", "Fully custom design", "SEO setup included", "2 rounds of revisions", "2–3 week turnaround", "30 days of post-launch tweaks"],
+  color: "mid",
+  featured: true
+}, {
+  name: "Full Custom Build",
+  price: "4,500+",
+  description: "For businesses that need integrations, animation, or complex features.",
+  features: ["Unlimited pages", "Custom functionality & integrations", "Motion & interaction design", "Priority turnaround", "Dedicated revisions", "30 days of post-launch support"],
+  color: "light"
+}];
+const hostingPlans = [{
+  name: "Basic Hosting",
+  price: "20",
+  features: ["Reliable hosting", "SSL & security included", "Uptime monitoring"]
+}, {
+  name: "Hosting + Edits",
+  price: "40",
+  features: ["Everything in Basic", "Up to 2 small edits/month", "Domain renewal handled"],
+  featured: true
+}, {
+  name: "Priority Care",
+  price: "65",
+  features: ["Everything in Edits", "Priority email support", "Same-week update turnaround"]
+}];
 const steps = [["Subscribe", "Pick a plan. No contracts — pause or cancel whenever the calendar gets quiet."], ["Submit a request", "Drop your flyer brief into the queue: event, promotion, menu, or announcement."], ["Get a draft", "A considered, on-brand design lands back in your inbox, ready to review."], ["Revise & ship", "Request changes if needed, then download polished print- and web-ready files."]];
 function RegMark({
   position
@@ -141,10 +176,11 @@ function FlowStudio() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("main", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "site-header", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap nav-inner", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo logo-bordered", href: "#top", "aria-label": "Flow Studio home", onClick: closeMenu, children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-icon.png", alt: "Flow Studio", className: "logo-image" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo", href: "#top", "aria-label": "Flow Studio home", onClick: closeMenu, children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-full1.png", alt: "Flow Studio", className: "logo-image" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "desktop-nav", "aria-label": "Primary navigation", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#services", children: "Services" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", children: "Flyer subscription" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#websites", children: "Website pricing" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#how", children: "How it works" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#work", children: "Work" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "nav-login", href: "https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login", children: "Client login" }),
@@ -158,6 +194,7 @@ function FlowStudio() {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: `mobile-nav ${menuOpen ? "open" : ""}`, "aria-label": "Mobile navigation", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#services", onClick: closeMenu, children: "Services" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", onClick: closeMenu, children: "Flyer subscription" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#websites", onClick: closeMenu, children: "Website pricing" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#how", onClick: closeMenu, children: "How it works" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#work", onClick: closeMenu, children: "Work" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login", onClick: closeMenu, children: "Client login" }),
@@ -300,6 +337,57 @@ function FlowStudio() {
         ] })
       ] })
     ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "website-pricing section", id: "websites", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap reveal", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "section-label mono", children: "02.5 / Website design & dev" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "section-heading", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "display", children: [
+          "A site built",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          "to convert."
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "One-time project pricing — pick the scope that fits, or start small and grow into it. Payment plans available on request." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "plan-grid website-grid", children: websitePlans.map((plan) => /* @__PURE__ */ jsxRuntimeExports.jsxs("article", { className: `plan website-plan ${plan.featured ? "featured" : ""}`, children: [
+        plan.featured && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "best-value mono", children: "Most popular" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "plan-name mono", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: plan.color }),
+          plan.name,
+          plan.note && ` / ${plan.note}`
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "price", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "$" }),
+          plan.price
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "plan-description", children: plan.description }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "tear-line" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { children: plan.features.map((feature) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { size: 15 }),
+          feature
+        ] }, feature)) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "#intake", className: `button ${plan.featured ? "button-solid" : "button-outline"}`, children: [
+          "Get started",
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 16 })
+        ] })
+      ] }, plan.name)) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hosting-block", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "section-label mono", style: {
+          marginTop: 60
+        }, children: "Optional / Ongoing hosting & care" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "hosting-intro", children: "Skip the hassle of managing hosting yourself — we keep your site fast, secure, and updated." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hosting-grid", children: hostingPlans.map((plan) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `hosting-card ${plan.featured ? "featured" : ""}`, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hosting-name mono", children: plan.name }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hosting-price", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "$" }),
+            plan.price,
+            /* @__PURE__ */ jsxRuntimeExports.jsx("small", { children: "/mo" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { children: plan.features.map((f) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { size: 13 }),
+            f
+          ] }, f)) })
+        ] }, plan.name)) })
+      ] })
+    ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "how section", id: "how", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap reveal", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "section-label mono", children: "03 / How it works" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "section-heading", children: [
@@ -436,16 +524,16 @@ function FlowStudio() {
         intakeStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
           color: "#a31e22",
           fontSize: 13
-        }, children: "Something went wrong sending that — try again, or email hello@flowstudio.design directly." })
+        }, children: "Something went wrong sending that — try again, or email email@flowstudiogrfx.com directly." })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "button-row centered", style: {
         marginTop: 20
       }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#subscription", className: "button button-outline", children: "View flyer plans" }) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("footer", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap footer-inner", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo footer-logo", href: "#top", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-icon.png", alt: "Flow Studio", className: "logo-image" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo footer-logo", href: "#top", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-full1.png", alt: "Flow Studio", className: "logo-image" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mono", children: "Independent design studio / © 2026" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "mono footer-email", href: "mailto:email@flowstudiogrfx.com", children: "hello@flowstudio.design" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "mono footer-email", href: "mailto:email@flowstudiogrfx.com", children: "email@flowstudiogrfx.com" })
     ] }) })
   ] });
 }
