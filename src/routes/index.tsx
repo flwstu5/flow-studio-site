@@ -37,7 +37,7 @@ const services = [
 const plans = [
   {
     name: 'Starter',
-    price: '99',
+    price: '70',
     description: 'Best for small businesses that post occasionally.',
     features: ['2 digital flyers per month', '1 revision per flyer', '48–72 hour turnaround', 'Instagram + Facebook sizes'],
     color: 'dark',
@@ -46,7 +46,7 @@ const plans = [
   {
     name: 'Growth',
     note: 'Best value',
-    price: '175',
+    price: '150',
     description: 'Content-ready, with something new to post every week.',
     features: ['4 digital flyers per month', '2 revisions per flyer', 'All social media sizes', 'Priority turnaround', 'Basic captions included'],
     color: 'mid',
@@ -55,7 +55,7 @@ const plans = [
   },
   {
     name: 'Premium',
-    price: '300',
+    price: '275',
     description: 'For brands that need a consistent marketing rhythm.',
     features: ['8 digital flyers per month', '2 revisions per flyer', 'Multiple platform sizes', 'Priority turnaround', 'Captions + promo wording', '1 animated flyer monthly'],
     color: 'light',
