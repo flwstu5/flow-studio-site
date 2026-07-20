@@ -1,438 +1,255 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { ArrowDownRight, ArrowRight, Check, Menu, X } from 'lucide-react'
-import { createFileRoute } from '@tanstack/react-router'
-import { submitIntake } from '../server/intake'
+@import "tailwindcss" source("../");
 
-export const Route = createFileRoute('/')({
-  component: FlowStudio,
-})
-
-const services = [
-  {
-    title: 'Digital & print graphics',
-    text: 'Social sets, ads, packaging, and signage — designed for the format it ships in.',
-    type: 'Project-based',
-    color: 'dark',
-  },
-  {
-    title: 'Logo & brand design',
-    text: 'Mark, palette, type system, and guidelines that hold up across every touchpoint.',
-    type: 'Project-based',
-    color: 'mid',
-  },
-  {
-    title: 'Website design & dev',
-    text: 'Designed and built — from a single landing page to a complete multi-page site.',
-    type: 'Project-based',
-    color: 'light',
-  },
-  {
-    title: 'Flyer design',
-    text: 'Recurring flyers for promos, events, and specials — submit a request, get a design back.',
-    type: 'Subscription',
-    color: 'blend',
-  },
-]
-
-const plans = [
-  {
-    name: 'Starter',
-    price: '99',
-    description: 'Best for small businesses that post occasionally.',
-    features: ['2 digital flyers per month', '1 revision per flyer', '48–72 hour turnaround', 'Instagram + Facebook sizes'],
-    color: 'dark',
-    checkoutUrl: 'https://buy.stripe.com/9B6cN40NN0CSg1Q16c9sk00',
-  },
-  {
-    name: 'Growth',
-    note: 'Best value',
-    price: '175',
-    description: 'Content-ready, with something new to post every week.',
-    features: ['4 digital flyers per month', '2 revisions per flyer', 'All social media sizes', 'Priority turnaround', 'Basic captions included'],
-    color: 'mid',
-    featured: true,
-    checkoutUrl: 'https://buy.stripe.com/9B68wObsrbhwcPE5ms9sk01',
-  },
-  {
-    name: 'Premium',
-    price: '300',
-    description: 'For brands that need a consistent marketing rhythm.',
-    features: ['8 digital flyers per month', '2 revisions per flyer', 'Multiple platform sizes', 'Priority turnaround', 'Captions + promo wording', '1 animated flyer monthly'],
-    color: 'light',
-    checkoutUrl: 'https://buy.stripe.com/3cIfZg2VV1GWg1Q0289sk02',
-  },
-]
-
-const websitePlans = [
-  {
-    name: 'Starter Site',
-    price: '900',
-    description: 'A clean, professional single-page site to get you online fast.',
-    features: ['1-page custom layout', 'Mobile optimized', 'Contact form included', '1 week turnaround', '1 round of revisions'],
-    color: 'dark',
-  },
-  {
-    name: 'Growth Site',
-    note: 'Most popular',
-    price: '2,400',
-    description: 'A full multi-page site built around your brand and services.',
-    features: ['Up to 6 pages', 'Fully custom design', 'SEO setup included', '2 rounds of revisions', '2–3 week turnaround', '30 days of post-launch tweaks'],
-    color: 'mid',
-    featured: true,
-  },
-  {
-    name: 'Full Custom Build',
-    price: '4,500+',
-    description: 'For businesses that need integrations, animation, or complex features.',
-    features: ['Unlimited pages', 'Custom functionality & integrations', 'Motion & interaction design', 'Priority turnaround', 'Dedicated revisions', '30 days of post-launch support'],
-    color: 'light',
-  },
-]
-
-const hostingPlans = [
-  { name: 'Basic Hosting', price: '20', features: ['Reliable hosting', 'SSL & security included', 'Uptime monitoring'] },
-  { name: 'Hosting + Edits', price: '40', features: ['Everything in Basic', 'Up to 2 small edits/month', 'Domain renewal handled'], featured: true },
-  { name: 'Priority Care', price: '65', features: ['Everything in Edits', 'Priority email support', 'Same-week update turnaround'] },
-]
-
-const steps = [
-  ['Subscribe', 'Pick a plan. No contracts — pause or cancel whenever the calendar gets quiet.'],
-  ['Submit a request', 'Drop your flyer brief into the queue: event, promotion, menu, or announcement.'],
-  ['Get a draft', 'A considered, on-brand design lands back in your inbox, ready to review.'],
-  ['Revise & ship', 'Request changes if needed, then download polished print- and web-ready files.'],
-]
-
-function RegMark({ position }: { position: string }) {
-  return (
-    <svg className={`regmark ${position}`} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" />
-      <path d="M12 0v24M0 12h24" />
-    </svg>
-  )
+:root {
+  --paper: #f4f0e7;
+  --paper-bright: #fffdf8;
+  --ink: #181716;
+  --ink-soft: #66615b;
+  --red-dark: #a31e22;
+  --red-mid: #e75b43;
+  --red-light: #efaa8f;
+  --line: rgba(24, 23, 22, 0.2);
+  --display: 'Archivo Black', sans-serif;
+  --body: 'DM Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
 }
 
-function FlowStudio() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [intakeForm, setIntakeForm] = useState({
-    name: '',
-    email: '',
-    business: '',
-    serviceType: 'Logo & brand design',
-    budget: '',
-    message: '',
-  })
-  const [intakeStatus, setIntakeStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  content: '';
+  opacity: .22;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+}
+::selection { background: var(--red-mid); color: var(--paper-bright); }
+a { color: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outline-offset: 4px; }
+.display { font-family: var(--display); text-transform: uppercase; letter-spacing: -.035em; }
+.mono { font-family: var(--mono); text-transform: uppercase; letter-spacing: .055em; }
+.wrap { width: min(1180px, calc(100% - 64px)); margin: 0 auto; }
+.section { padding: 112px 0; }
 
-  function updateIntakeField(field: string, value: string) {
-    setIntakeForm((prev) => ({ ...prev, [field]: value }))
-  }
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 91%, transparent);
+  backdrop-filter: blur(12px);
+}
+.nav-inner { height: 76px; display: flex; align-items: center; justify-content: space-between; }
+.logo { display: inline-flex; align-items: center; gap: 13px; text-decoration: none; }
+.logo .display { font-size: 15px; letter-spacing: -.02em; }
+.ink-dots { display: flex; }
+.ink-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--red-dark); margin-left: -2px; }
+.ink-dots i:nth-child(2) { background: var(--red-mid); }
+.ink-dots i:nth-child(3) { background: var(--red-light); }
+.logo-image { height: 64px; width: auto; display: block; }
+.desktop-nav { display: flex; align-items: center; gap: 31px; }
+.desktop-nav > a { font-size: 13px; font-weight: 700; text-decoration: none; color: var(--ink-soft); transition: color .2s ease; }
+.desktop-nav > a:hover { color: var(--ink); }
+.nav-cta { display: inline-flex; align-items: center; gap: 9px; padding: 11px 16px; color: var(--paper-bright) !important; background: var(--ink); font-family: var(--mono); text-transform: uppercase; letter-spacing: .04em; }
+.menu-button { display: none; border: 0; background: none; color: var(--ink); padding: 6px; }
+.mobile-nav { display: none; }
 
-  async function handleIntakeSubmit(e: FormEvent) {
-    e.preventDefault()
-    setIntakeStatus('sending')
-    try {
-      await submitIntake({ data: intakeForm })
-      setIntakeStatus('sent')
-    } catch {
-      setIntakeStatus('error')
-    }
-  }
+.hero { padding: 70px 0 86px; overflow: hidden; }
+.proof {
+  position: relative;
+  border: 1.5px solid var(--ink);
+  padding: 35px 40px 26px;
+  background-color: var(--paper-bright);
+  background-image: repeating-linear-gradient(135deg, transparent 0 42px, rgba(24,23,22,.025) 42px 84px);
+  box-shadow: 14px 14px 0 rgba(24, 23, 22, .09);
+}
+.regmark { position: absolute; width: 23px; height: 23px; color: var(--ink); overflow: visible; }
+.regmark circle, .regmark path { stroke-width: 1; }
+.regmark.tl { top: -12px; left: -12px; }.regmark.tr { top: -12px; right: -12px; }.regmark.bl { bottom: -12px; left: -12px; }.regmark.br { bottom: -12px; right: -12px; }
+.proof-meta { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding-bottom: 18px; color: var(--ink-soft); font-size: 10px; line-height: 1.7; }
+.proof-meta > span { text-align: right; }
+.swatches { display: flex; gap: 3px; margin-top: 7px; }
+.swatches i { width: 17px; height: 8px; background: var(--red-dark); }
+.swatches i:nth-child(2) { background: var(--red-mid); }.swatches i:nth-child(3) { background: var(--red-light); }.swatches i:nth-child(4) { background: var(--ink); }
+.approval-stamp { position: absolute; top: 92px; right: 44px; width: 106px; height: 106px; border: 3px double var(--red-mid); border-radius: 50%; display: grid; place-items: center; color: var(--red-mid); font: 600 11px/1.35 var(--mono); text-align: center; text-transform: uppercase; letter-spacing: .1em; transform: rotate(9deg); }
+.hero-layout { display: grid; grid-template-columns: 1.5fr .65fr; gap: 85px; align-items: end; padding: 45px 0 48px; }
+.eyebrow { margin: 0 0 17px; color: var(--red-dark); font-size: 10px; font-weight: 600; }
+.hero h1 { margin: 0; font-size: clamp(47px, 6.25vw, 79px); line-height: .91; }
+.hero h1 span, .final-cta h2 span { color: var(--red-mid); }
+.hero-copy { padding: 0 0 5px; }
+.hero-copy > p { margin: 0 0 28px; color: var(--ink-soft); font-size: 17px; line-height: 1.6; }
+.button-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.button { min-height: 50px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1.5px solid var(--ink); text-decoration: none; font-size: 13px; font-weight: 700; transition: transform .2s ease, background .2s ease, color .2s ease; }
+.button:hover { transform: translate(-2px, -2px); }
+.button-solid { color: var(--paper-bright); background: var(--ink); box-shadow: 4px 4px 0 var(--red-mid); }
+.button-solid:hover { box-shadow: 6px 6px 0 var(--red-mid); }
+.button-outline { background: transparent; }
+.button-outline:hover { background: rgba(24,23,22,.07); }
+.proof-footer { display: flex; justify-content: space-between; border-top: 1px dashed var(--line); padding-top: 17px; color: var(--ink-soft); font-size: 9px; }
 
-  useEffect(() => {
-    const reveal = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')),
-      { threshold: 0.12 },
-    )
-    document.querySelectorAll('.reveal').forEach((element) => reveal.observe(element))
-    return () => reveal.disconnect()
-  }, [])
+.section-label { margin: 0 0 26px; color: var(--red-dark); font-size: 11px; font-weight: 600; }
+.section-heading { display: grid; grid-template-columns: 1.5fr .65fr; gap: 80px; align-items: end; margin-bottom: 54px; }
+.section-heading h2 { margin: 0; font-size: clamp(39px, 5vw, 64px); line-height: .98; }
+.section-heading > p { margin: 0 0 5px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+.service-grid { display: grid; grid-template-columns: 1.12fr .88fr 1.12fr .88fr; border: 1.5px solid var(--ink); background: var(--ink); gap: 1px; }
+.service-card { min-height: 315px; padding: 27px 24px 23px; display: flex; flex-direction: column; background: var(--paper-bright); transition: background .25s ease; }
+.service-card:hover { background: #ebe5da; }
+.service-tab { width: 46px; height: 7px; margin-bottom: 25px; }
+.service-tab.dark { background: var(--red-dark); }.service-tab.mid { background: var(--red-mid); }.service-tab.light { background: var(--red-light); }.service-tab.blend { background: linear-gradient(90deg, var(--red-dark) 33%, var(--red-mid) 33% 66%, var(--red-light) 66%); }
+.service-number { color: var(--ink-soft); font-size: 10px; margin-bottom: auto; }
+.service-card h3 { margin: 35px 0 10px; font-size: 18px; line-height: 1.2; }
+.service-card p { margin: 0 0 22px; color: var(--ink-soft); font-size: 14px; line-height: 1.55; }
+.service-type { border-top: 1px dashed var(--line); padding-top: 13px; font-size: 9px; color: var(--ink-soft); }
 
-  const closeMenu = () => setMenuOpen(false)
+.subscription { position: relative; background: var(--ink); color: var(--paper-bright); overflow: hidden; }
+.subscription::before { content: 'SUBSCRIBE'; position: absolute; right: -40px; top: 45px; color: rgba(255,255,255,.025); font: 400 170px/.8 var(--display); letter-spacing: -.06em; }
+.light-label { color: var(--red-light); }
+.subscription-heading > p { color: #aaa39b; }
+.subscription-heading h2 em { color: var(--red-mid); font-style: normal; }
+.plan-grid { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+.plan { position: relative; padding: 31px 28px 28px; border: 1px solid #5b5752; background: #211f1d; display: flex; flex-direction: column; }
+.plan + .plan { border-left: 0; }
+.plan.featured { background: var(--paper-bright); color: var(--ink); transform: translateY(-12px); box-shadow: 0 18px 35px rgba(0,0,0,.25); }
+.best-value { position: absolute; right: 20px; top: -13px; padding: 6px 10px; background: var(--red-mid); color: var(--paper-bright); font-size: 8px; }
+.plan-name { display: flex; align-items: center; gap: 9px; color: #c4bdb4; font-size: 10px; }
+.featured .plan-name { color: var(--ink-soft); }
+.plan-name i { width: 9px; height: 9px; border-radius: 50%; background: var(--red-dark); }
+.plan-name i.mid { background: var(--red-mid); }.plan-name i.light { background: var(--red-light); }
+.price { margin: 21px 0 3px; font: 400 48px/1 var(--display); letter-spacing: -.04em; }
+.price > span { font-size: 19px; vertical-align: top; line-height: 1.5; }
+.price small { margin-left: 8px; color: #8b857e; font: 600 11px var(--body); letter-spacing: 0; }
+.plan-description { min-height: 46px; margin: 9px 0 22px; color: #aaa39b; font-size: 13px; }
+.featured .plan-description { color: var(--ink-soft); }
+.tear-line { border-top: 1px dashed #514e49; margin-bottom: 18px; }
+.featured .tear-line { border-color: var(--line); }
+.plan ul { flex: 1; list-style: none; margin: 0 0 27px; padding: 0; }
+.plan li { display: flex; gap: 10px; align-items: center; padding: 7px 0; font-size: 13px; }
+.plan li svg { color: var(--red-light); flex: 0 0 auto; }
+.featured .plan li svg { color: var(--red-mid); }
+.plan .button { width: 100%; border-color: #77716b; color: var(--paper-bright); }
+.featured .button-paper { color: var(--paper-bright); background: var(--ink); border-color: var(--ink); }
+.addons { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); margin-top: 46px; border-top: 1px dashed #5b5752; border-bottom: 1px dashed #5b5752; }
+.addons > p, .addons > div { margin: 0; padding: 19px 18px; border-right: 1px dashed #5b5752; }
+.addons > p { padding-left: 0; color: var(--red-light); font-size: 9px; }
+.addons > div { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #aaa39b; }
+.addons > div:last-child { border: 0; }
+.addons strong { color: var(--paper-bright); font-family: var(--mono); font-size: 10px; }
 
-  return (
-    <main>
-      <header className="site-header">
-        <div className="wrap nav-inner">
-          <a className="logo" href="#top" aria-label="Flow Studio home" onClick={closeMenu}>
-            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
-          </a>
-          <nav className="desktop-nav" aria-label="Primary navigation">
-            <a href="#services">Services</a>
-            <a href="#subscription">Flyer subscription</a>
-            <a href="#websites">Website pricing</a>
-            <a href="#how">How it works</a>
-            <a href="#work">Work</a>
-            <a className="nav-login" href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Client login</a>
-            <a className="nav-cta" href="#intake">Start a project <ArrowRight size={14} /></a>
-          </nav>
-          <button className="menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">
-            {menuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-        <nav className={`mobile-nav ${menuOpen ? 'open' : ''}`} aria-label="Mobile navigation">
-          <a href="#services" onClick={closeMenu}>Services</a>
-          <a href="#subscription" onClick={closeMenu}>Flyer subscription</a>
-          <a href="#websites" onClick={closeMenu}>Website pricing</a>
-          <a href="#how" onClick={closeMenu}>How it works</a>
-          <a href="#work" onClick={closeMenu}>Work</a>
-          <a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login" onClick={closeMenu}>Client login</a>
-          <a href="#intake" onClick={closeMenu}>Start a project <ArrowRight size={16} /></a>
-        </nav>
-      </header>
+.website-pricing { background: var(--paper); }
+.website-grid .plan { background: var(--paper-bright); border-color: var(--line); color: var(--ink); }
+.website-grid .plan-name { color: var(--ink-soft); }
+.website-grid .plan-description { color: var(--ink-soft); }
+.website-grid .tear-line { border-color: var(--line); }
+.website-grid .plan li svg { color: var(--red-mid); }
+.website-grid .plan .button-outline { border-color: var(--ink); color: var(--ink); }
+.website-plan.featured { background: var(--paper-bright); border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--red-light); transform: translateY(-8px); }
+.website-grid .plan:not(.featured) .plan-name { color: #fff; }
 
-      <section className="hero" id="top">
-        <div className="wrap">
-          <div className="proof hero-enter">
-            <RegMark position="tl" /><RegMark position="tr" /><RegMark position="bl" /><RegMark position="br" />
-            <div className="proof-meta mono">
-              <div>
-                <span>Job № 0417 — Proof approved</span>
-                <div className="swatches" aria-label="Press color swatches"><i /><i /><i /><i /></div>
-              </div>
-              <span>Run: open<br />Press: online</span>
-            </div>
-            <div className="approval-stamp">Design<br />on press</div>
-            <div className="hero-layout">
-              <div>
-                <p className="eyebrow mono">Independent creative studio / Est. 2020</p>
-                <h1 className="display">Brand, print<br />& web design<span>.</span><br />Plus flyers,<br />on repeat<span>.</span></h1>
-              </div>
-              <div className="hero-copy">
-                <p>Full-service graphic design for logos, brand identity, and websites — with a flyer subscription that keeps fresh work landing every month, no re-briefing required.</p>
-                <div className="button-row">
-                  <a href="#intake" className="button button-solid">Start a project <ArrowDownRight size={18} /></a>
-                  <a href="#subscription" className="button button-outline">See flyer plans</a>
-                </div>
-              </div>
-            </div>
-            <div className="proof-footer mono"><span>CMYK / 300 DPI</span><span>Trim 1180 × 650</span><span>Sheet 01 of 01</span></div>
-          </div>
-        </div>
-      </section>
+.hosting-block { margin-top: 20px; }
+.hosting-intro { margin: 0 0 28px; color: var(--ink-soft); font-size: 15px; max-width: 560px; }
+.hosting-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.hosting-card { padding: 24px 22px; border: 1px solid var(--line); background: var(--paper-bright); }
+.hosting-card.featured { border: 1.5px solid var(--ink); box-shadow: 5px 5px 0 var(--red-mid); }
+.hosting-name { color: var(--ink-soft); font-size: 10px; margin-bottom: 12px; }
+.hosting-price { font: 400 32px/1 var(--display); letter-spacing: -.03em; margin-bottom: 16px; }
+.hosting-price span { font-size: 15px; vertical-align: top; }
+.hosting-price small { margin-left: 6px; color: var(--ink-soft); font: 600 10px var(--body); letter-spacing: 0; }
+.hosting-card ul { list-style: none; margin: 0; padding: 0; }
+.hosting-card li { display: flex; gap: 8px; align-items: center; padding: 5px 0; font-size: 12px; color: var(--ink-soft); }
+.hosting-card li svg { color: var(--red-mid); flex: 0 0 auto; }
 
-      <section className="services section" id="services">
-        <div className="wrap reveal">
-          <p className="section-label mono">01 / Services</p>
-          <div className="section-heading">
-            <h2 className="display">Every format<br />your brand touches.</h2>
-            <p>One studio from first sketch to final export — digital, print, identity, and screen.</p>
-          </div>
-          <div className="service-grid">
-            {services.map((service, index) => (
-              <article className="service-card" key={service.title}>
-                <div className={`service-tab ${service.color}`} />
-                <span className="service-number mono">0{index + 1}</span>
-                <h3>{service.title}</h3>
-                <p>{service.text}</p>
-                <span className="service-type mono">{service.type}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); }
+.step { min-height: 240px; padding: 25px 25px 20px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); border-right: 1px solid var(--line); }
+.step:first-child { border-left: 1.5px solid var(--ink); }.step:last-child { border-right: 1.5px solid var(--ink); }
+.step-top { display: flex; align-items: center; gap: 13px; margin-bottom: 74px; }
+.step-top span { color: var(--red-mid); font-size: 10px; font-weight: 600; }
+.step-top i { height: 1px; flex: 1; background: var(--line); position: relative; }
+.step-top i::after { content: ''; position: absolute; right: -1px; top: -3px; width: 7px; height: 7px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); transform: rotate(45deg); }
+.step h3 { margin: 0 0 9px; font-size: 17px; }
+.step p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
 
-      <section className="subscription section" id="subscription">
-        <div className="wrap reveal">
-          <p className="section-label mono light-label">02 / Flyer subscription</p>
-          <div className="section-heading subscription-heading">
-            <h2 className="display">Stay consistent.<br /><em>Stay visible.</em></h2>
-            <p>Professional flyers every month, without booking one by one. Send requests through your queue and get on-brand work back on schedule.</p>
-          </div>
-          <div className="plan-grid">
-            {plans.map((plan) => (
-              <article className={`plan ${plan.featured ? 'featured' : ''}`} key={plan.name}>
-                {plan.featured && <span className="best-value mono">Most ordered</span>}
-                <div className="plan-name mono"><i className={plan.color} />{plan.name}{plan.note && ` / ${plan.note}`}</div>
-                <div className="price"><span>$</span>{plan.price}<small>/ month</small></div>
-                <p className="plan-description">{plan.description}</p>
-                <div className="tear-line" />
-                <ul>
-                  {plan.features.map((feature) => <li key={feature}><Check size={15} />{feature}</li>)}
-                </ul>
-                <a href={plan.checkoutUrl} className={`button ${plan.featured ? 'button-paper' : 'button-outline'}`}>Choose {plan.name}<ArrowRight size={16} /></a>
-              </article>
-            ))}
-          </div>
-          <div className="addons">
-            <p className="mono">Add to any run</p>
-            <div><span>Motion flyer</span><strong>+$40–75</strong></div>
-            <div><span>Rush delivery / under 24 hrs</span><strong>+$35</strong></div>
-            <div><span>Extra revision</span><strong>+$15–25</strong></div>
-            <div><span>Additional size</span><strong>+$10</strong></div>
-          </div>
-        </div>
-      </section>
+.work { background: #e9e3d8; }
+.work-grid { display: grid; grid-template-columns: 1.18fr .82fr .95fr; gap: 18px; align-items: end; }
+.work-card { margin: 0; }
+.work-brand, .work-web, .work-flyer { display: flex; flex-direction: column; }
+.poster-brand { position: relative; aspect-ratio: 4/3.15; display: grid; place-items: center; background: var(--red-dark); color: var(--paper-bright); border: 1.5px solid var(--ink); transform: rotate(-1deg); }
+.poster-brand span { font: 400 clamp(54px, 7vw, 94px)/.7 var(--display); letter-spacing: -.08em; text-align: center; }
+.poster-brand small { position: absolute; transform: rotate(90deg); right: 16px; font: 500 9px var(--mono); letter-spacing: .2em; }
+.browser { aspect-ratio: 4/4.2; background: #c9c0af; border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--red-mid); }
+.browser-bar { height: 28px; border-bottom: 1px solid var(--ink); display: flex; align-items: center; gap: 4px; padding: 0 9px; }
+.browser-bar i { width: 6px; height: 6px; border: 1px solid var(--ink); border-radius: 50%; }
+.browser-body { height: calc(100% - 28px); padding: 25px 20px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg, transparent 55%, rgba(255,255,255,.3) 55%); }
+.browser-body span { font: 500 9px var(--mono); }.browser-body strong { margin: 17px 0 30px; font: 400 29px/1.05 var(--display); text-transform: uppercase; }.browser-body button { align-self: flex-start; border: 1px solid var(--ink); padding: 8px 10px; background: transparent; font: 600 8px var(--mono); text-transform: uppercase; }
+.flyer-stack { position: relative; aspect-ratio: 4/3.55; border: 1.5px solid var(--ink); background: var(--red-light); overflow: hidden; }
+.flyer { position: absolute; width: 57%; height: 82%; border: 1px solid var(--ink); padding: 15px; }
+.flyer.back { left: 7%; top: 8%; background: var(--paper-bright); color: var(--red-dark); font: 400 51px/.8 var(--display); transform: rotate(-9deg); }
+.flyer.front { right: 7%; bottom: -4%; display: flex; flex-direction: column; background: var(--ink); color: var(--paper-bright); transform: rotate(6deg); }
+.flyer.front small, .flyer.front span { font: 500 7px var(--mono); letter-spacing: .1em; }.flyer.front strong { margin: auto 0; font: 400 27px/.86 var(--display); color: var(--red-light); }
+.work-caption { display: flex; justify-content: space-between; gap: 15px; align-items: baseline; padding: 17px 2px 0; font-weight: 700; font-size: 14px; }
+.work-caption small { color: var(--ink-soft); font-size: 8px; font-weight: 500; text-align: right; }
 
-      <section className="website-pricing section" id="websites">
-        <div className="wrap reveal">
-          <p className="section-label mono">02.5 / Website design & dev</p>
-          <div className="section-heading">
-            <h2 className="display">A site built<br />to convert.</h2>
-            <p>One-time project pricing — pick the scope that fits, or start small and grow into it. Payment plans available on request.</p>
-          </div>
-          <div className="plan-grid website-grid">
-            {websitePlans.map((plan) => (
-              <article className={`plan website-plan ${plan.featured ? 'featured' : ''}`} key={plan.name}>
-                {plan.featured && <span className="best-value mono">Most popular</span>}
-                <div className="plan-name mono"><i className={plan.color} />{plan.name}{plan.note && ` / ${plan.note}`}</div>
-                <div className="price"><span>$</span>{plan.price}</div>
-                <p className="plan-description">{plan.description}</p>
-                <div className="tear-line" />
-                <ul>
-                  {plan.features.map((feature) => <li key={feature}><Check size={15} />{feature}</li>)}
-                </ul>
-                <a href="#intake" className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Get started<ArrowRight size={16} /></a>
-              </article>
-            ))}
-          </div>
+.final-cta { padding: 120px 0; }
+.cta-proof { position: relative; padding: 75px 40px; border: 1.5px solid var(--ink); background: var(--paper-bright); text-align: center; box-shadow: 12px 12px 0 var(--red-light); }
+.cta-proof h2 { margin: 0 0 24px; font-size: clamp(45px, 6.5vw, 81px); line-height: .9; }
+.cta-proof > p:not(.section-label) { max-width: 530px; margin: 0 auto 32px; color: var(--ink-soft); font-size: 16px; }
+.centered { justify-content: center; }
+footer { border-top: 1px solid var(--line); padding: 35px 0; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 25px; color: var(--ink-soft); font-size: 9px; }
+.footer-logo { color: var(--ink); }
+.footer-logo .logo-image { height: 44px; }
+.footer-email { text-decoration: none; }
+.footer-email:hover { color: var(--red-dark); }
 
-          <div className="hosting-block">
-            <p className="section-label mono" style={{ marginTop: 60 }}>Optional / Ongoing hosting & care</p>
-            <p className="hosting-intro">Skip the hassle of managing hosting yourself — we keep your site fast, secure, and updated.</p>
-            <div className="hosting-grid">
-              {hostingPlans.map((plan) => (
-                <div className={`hosting-card ${plan.featured ? 'featured' : ''}`} key={plan.name}>
-                  <div className="hosting-name mono">{plan.name}</div>
-                  <div className="hosting-price"><span>$</span>{plan.price}<small>/mo</small></div>
-                  <ul>
-                    {plan.features.map((f) => <li key={f}><Check size={13} />{f}</li>)}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+.hero-enter { animation: press-in .8s cubic-bezier(.2,.8,.2,1) both; }
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+@keyframes press-in { from { opacity: 0; transform: translateY(18px) rotate(.3deg); } to { opacity: 1; transform: none; } }
 
-      <section className="how section" id="how">
-        <div className="wrap reveal">
-          <p className="section-label mono">03 / How it works</p>
-          <div className="section-heading">
-            <h2 className="display">A queue,<br />not a quote.</h2>
-            <p>Less admin. More finished work. A simple process designed to keep momentum moving.</p>
-          </div>
-          <div className="steps">
-            {steps.map(([title, text], index) => (
-              <article className="step" key={title}>
-                <div className="step-top"><span className="mono">0{index + 1}</span><i /></div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+@media (max-width: 940px) {
+  .desktop-nav { display: none; }.menu-button { display: block; }
+  .mobile-nav { position: absolute; left: 0; right: 0; top: 76px; display: grid; background: var(--paper); border-bottom: 1px solid var(--ink); padding: 0 32px; max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s ease; }
+  .mobile-nav.open { max-height: 360px; padding-top: 15px; padding-bottom: 20px; }
+  .mobile-nav a { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px dashed var(--line); text-decoration: none; font-weight: 700; }
+  .hero-layout, .section-heading { grid-template-columns: 1fr; gap: 28px; }
+  .hero-copy { max-width: 620px; }.approval-stamp { top: 90px; }
+  .service-grid { grid-template-columns: repeat(2, 1fr); }.service-card { min-height: 280px; }
+  .plan-grid { grid-template-columns: 1fr; gap: 18px; }.plan + .plan { border-left: 1px solid #5b5752; }.plan.featured { transform: none; }
+  .website-grid { grid-template-columns: 1fr; gap: 18px; }
+  .website-plan.featured { transform: none; }
+  .hosting-grid { grid-template-columns: 1fr; }
+  .addons { grid-template-columns: 1fr 1fr; }.addons > p { grid-column: 1 / -1; border-right: 0; }.addons > div:nth-child(odd) { border-right: 0; }
+  .steps { grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--ink); border: 1px solid var(--ink); }.step, .step:first-child, .step:last-child { border: 0; background: var(--paper); }
+  .work-grid { grid-template-columns: 1fr 1fr; }.work-card:last-child { grid-column: 1 / -1; width: 55%; justify-self: center; }
+}
 
-      <section className="work section" id="work">
-        <div className="wrap reveal">
-          <p className="section-label mono">04 / Selected work</p>
-          <div className="section-heading">
-            <h2 className="display">Recent jobs,<br />fresh off press.</h2>
-            <p>A mix of identities, websites, and campaign work made to be seen in the real world.</p>
-          </div>
-          <div className="work-grid">
-            <article className="work-card work-brand">
-              <div className="poster-brand"><span>LOW<br />TIDE</span><small>COFFEE CO.</small></div>
-              <div className="work-caption"><span>Low Tide Coffee</span><small className="mono">Brand identity / 2026</small></div>
-            </article>
-            <article className="work-card work-web">
-              <div className="browser"><div className="browser-bar"><i /><i /><i /></div><div className="browser-body"><span>FORM / 07</span><strong>Objects for<br />quiet rooms.</strong><button>Explore collection</button></div></div>
-              <div className="work-caption"><span>Form House</span><small className="mono">Web design / 2026</small></div>
-            </article>
-            <article className="work-card work-flyer">
-              <div className="flyer-stack"><div className="flyer back">FRI<br />28</div><div className="flyer front"><small>AFTER DARK</small><strong>HOUSE<br />GUESTS</strong><span>10PM — LATE</span></div></div>
-              <div className="work-caption"><span>House Guests</span><small className="mono">Flyer series / 2025</small></div>
-            </article>
-          </div>
-        </div>
-      </section>
+@media (max-width: 620px) {
+  .wrap { width: min(100% - 36px, 1180px); }.section { padding: 78px 0; }
+  .hero { padding: 43px 0 62px; }.proof { padding: 25px 20px 20px; box-shadow: 8px 8px 0 rgba(24,23,22,.09); }
+  .approval-stamp { display: none; }.proof-meta { font-size: 8px; }.hero-layout { padding: 32px 0; }.hero h1 { font-size: clamp(39px, 12.5vw, 58px); }.hero-copy > p { font-size: 15px; }
+  .button { width: 100%; }.proof-footer span:nth-child(2) { display: none; }
+  .section-label { margin-bottom: 19px; }.section-heading { margin-bottom: 38px; }.section-heading h2 { font-size: 39px; }
+  .service-grid { grid-template-columns: 1fr; }.service-card { min-height: 245px; }
+  .subscription::before { display: none; }.plan { padding: 27px 22px; }.price { font-size: 43px; }
+  .addons { grid-template-columns: 1fr; }.addons > div, .addons > div:nth-child(odd) { border-right: 0; border-top: 1px dashed #5b5752; padding-left: 0; }
+  .steps { grid-template-columns: 1fr; }.step { min-height: 205px; }.step-top { margin-bottom: 49px; }
+  .work-grid { grid-template-columns: 1fr; gap: 40px; }.work-card:last-child { grid-column: auto; width: 100%; }.poster-brand { transform: none; }
+  .cta-proof { padding: 55px 20px; box-shadow: 7px 7px 0 var(--red-light); }.cta-proof h2 { font-size: 44px; }
+  .footer-inner { flex-direction: column; align-items: flex-start; }.footer-logo { margin-bottom: 10px; }
+}
 
-      <section className="final-cta" id="intake">
-        <div className="wrap reveal">
-          <div className="cta-proof">
-            <RegMark position="tl" /><RegMark position="tr" /><RegMark position="bl" /><RegMark position="br" />
-            <p className="section-label mono">Start here / New business</p>
-            <h2 className="display">Tell us what<br />you're building<span>.</span></h2>
-            <p>One-off project or ongoing flyers — either way, it starts with a short brief and an honest conversation.</p>
-
-            {intakeStatus === 'sent' ? (
-              <p style={{ marginTop: 24, fontWeight: 600 }}>
-                Got it — thanks! We'll be in touch shortly.
-              </p>
-            ) : (
-              <form
-                onSubmit={handleIntakeSubmit}
-                style={{ display: 'grid', gap: 14, maxWidth: 480, margin: '28px auto 0', textAlign: 'left' }}
-              >
-                <input
-                  required
-                  placeholder="Your name"
-                  value={intakeForm.name}
-                  onChange={(e) => updateIntakeField('name', e.target.value)}
-                />
-                <input
-                  required
-                  type="email"
-                  placeholder="Email address"
-                  value={intakeForm.email}
-                  onChange={(e) => updateIntakeField('email', e.target.value)}
-                />
-                <input
-                  required
-                  placeholder="Business / brand name"
-                  value={intakeForm.business}
-                  onChange={(e) => updateIntakeField('business', e.target.value)}
-                />
-                <select
-                  value={intakeForm.serviceType}
-                  onChange={(e) => updateIntakeField('serviceType', e.target.value)}
-                >
-                  <option>Logo & brand design</option>
-                  <option>Website design & dev</option>
-                  <option>Digital & print graphics</option>
-                  <option>Flyer subscription</option>
-                  <option>Something else</option>
-                </select>
-                <input
-                  required
-                  placeholder="Budget range (e.g. $500–1000)"
-                  value={intakeForm.budget}
-                  onChange={(e) => updateIntakeField('budget', e.target.value)}
-                />
-                <textarea
-                  required
-                  rows={4}
-                  placeholder="Tell us about the project"
-                  value={intakeForm.message}
-                  onChange={(e) => updateIntakeField('message', e.target.value)}
-                />
-                <button type="submit" className="button button-solid" disabled={intakeStatus === 'sending'}>
-                  {intakeStatus === 'sending' ? 'Sending…' : 'Submit project brief'} <ArrowRight size={17} />
-                </button>
-                {intakeStatus === 'error' && (
-                  <p style={{ color: '#a31e22', fontSize: 13 }}>
-                    Something went wrong sending that — try again, or email email@flowstudiogrfx.com directly.
-                  </p>
-                )}
-              </form>
-            )}
-
-            <div className="button-row centered" style={{ marginTop: 20 }}>
-              <a href="#subscription" className="button button-outline">View flyer plans</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer>
-        <div className="wrap footer-inner">
-          <a className="logo footer-logo" href="#top">
-            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
-          </a>
-          <span className="mono">Independent design studio / © 2026</span>
-          <a className="mono footer-email" href="mailto:email@flowstudiogrfx.com">email@flowstudiogrfx.com</a>
-        </div>
-      </footer>
-    </main>
-  )
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .reveal { opacity: 1; transform: none; }
 }
