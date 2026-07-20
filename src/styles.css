@@ -176,6 +176,17 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .hosting-card li { display: flex; gap: 8px; align-items: center; padding: 5px 0; font-size: 12px; color: var(--ink-soft); }
 .hosting-card li svg { color: var(--red-mid); flex: 0 0 auto; }
 
+.custom-build-form { padding-top: 10px; }
+.custom-build-form input, .custom-build-form textarea, .custom-build-form select {
+  padding: 13px 15px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper-bright);
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--ink);
+}
+.custom-build-form input::placeholder, .custom-build-form textarea::placeholder { color: var(--ink-soft); }
+
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); }
 .step { min-height: 240px; padding: 25px 25px 20px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); border-right: 1px solid var(--line); }
 .step:first-child { border-left: 1.5px solid var(--ink); }.step:last-child { border-right: 1.5px solid var(--ink); }
