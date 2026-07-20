@@ -63,6 +63,38 @@ const plans = [
   },
 ]
 
+const websitePlans = [
+  {
+    name: 'Starter Site',
+    price: '900',
+    description: 'A clean, professional single-page site to get you online fast.',
+    features: ['1-page custom layout', 'Mobile optimized', 'Contact form included', '1 week turnaround', '1 round of revisions'],
+    color: 'dark',
+  },
+  {
+    name: 'Growth Site',
+    note: 'Most popular',
+    price: '2,400',
+    description: 'A full multi-page site built around your brand and services.',
+    features: ['Up to 6 pages', 'Fully custom design', 'SEO setup included', '2 rounds of revisions', '2–3 week turnaround', '30 days of post-launch tweaks'],
+    color: 'mid',
+    featured: true,
+  },
+  {
+    name: 'Full Custom Build',
+    price: '4,500+',
+    description: 'For businesses that need integrations, animation, or complex features.',
+    features: ['Unlimited pages', 'Custom functionality & integrations', 'Motion & interaction design', 'Priority turnaround', 'Dedicated revisions', '30 days of post-launch support'],
+    color: 'light',
+  },
+]
+
+const hostingPlans = [
+  { name: 'Basic Hosting', price: '20', features: ['Reliable hosting', 'SSL & security included', 'Uptime monitoring'] },
+  { name: 'Hosting + Edits', price: '40', features: ['Everything in Basic', 'Up to 2 small edits/month', 'Domain renewal handled'], featured: true },
+  { name: 'Priority Care', price: '65', features: ['Everything in Edits', 'Priority email support', 'Same-week update turnaround'] },
+]
+
 const steps = [
   ['Subscribe', 'Pick a plan. No contracts — pause or cancel whenever the calendar gets quiet.'],
   ['Submit a request', 'Drop your flyer brief into the queue: event, promotion, menu, or announcement.'],
@@ -121,12 +153,13 @@ function FlowStudio() {
     <main>
       <header className="site-header">
         <div className="wrap nav-inner">
-          <a className="logo logo-bordered" href="#top" aria-label="Flow Studio home" onClick={closeMenu}>
+          <a className="logo" href="#top" aria-label="Flow Studio home" onClick={closeMenu}>
             <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
           </a>
           <nav className="desktop-nav" aria-label="Primary navigation">
             <a href="#services">Services</a>
             <a href="#subscription">Flyer subscription</a>
+            <a href="#websites">Website pricing</a>
             <a href="#how">How it works</a>
             <a href="#work">Work</a>
             <a className="nav-login" href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Client login</a>
@@ -139,6 +172,7 @@ function FlowStudio() {
         <nav className={`mobile-nav ${menuOpen ? 'open' : ''}`} aria-label="Mobile navigation">
           <a href="#services" onClick={closeMenu}>Services</a>
           <a href="#subscription" onClick={closeMenu}>Flyer subscription</a>
+          <a href="#websites" onClick={closeMenu}>Website pricing</a>
           <a href="#how" onClick={closeMenu}>How it works</a>
           <a href="#work" onClick={closeMenu}>Work</a>
           <a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login" onClick={closeMenu}>Client login</a>
@@ -225,6 +259,47 @@ function FlowStudio() {
             <div><span>Rush delivery / under 24 hrs</span><strong>+$35</strong></div>
             <div><span>Extra revision</span><strong>+$15–25</strong></div>
             <div><span>Additional size</span><strong>+$10</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="website-pricing section" id="websites">
+        <div className="wrap reveal">
+          <p className="section-label mono">02.5 / Website design & dev</p>
+          <div className="section-heading">
+            <h2 className="display">A site built<br />to convert.</h2>
+            <p>One-time project pricing — pick the scope that fits, or start small and grow into it. Payment plans available on request.</p>
+          </div>
+          <div className="plan-grid website-grid">
+            {websitePlans.map((plan) => (
+              <article className={`plan website-plan ${plan.featured ? 'featured' : ''}`} key={plan.name}>
+                {plan.featured && <span className="best-value mono">Most popular</span>}
+                <div className="plan-name mono"><i className={plan.color} />{plan.name}{plan.note && ` / ${plan.note}`}</div>
+                <div className="price"><span>$</span>{plan.price}</div>
+                <p className="plan-description">{plan.description}</p>
+                <div className="tear-line" />
+                <ul>
+                  {plan.features.map((feature) => <li key={feature}><Check size={15} />{feature}</li>)}
+                </ul>
+                <a href="#intake" className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Get started<ArrowRight size={16} /></a>
+              </article>
+            ))}
+          </div>
+
+          <div className="hosting-block">
+            <p className="section-label mono" style={{ marginTop: 60 }}>Optional / Ongoing hosting & care</p>
+            <p className="hosting-intro">Skip the hassle of managing hosting yourself — we keep your site fast, secure, and updated.</p>
+            <div className="hosting-grid">
+              {hostingPlans.map((plan) => (
+                <div className={`hosting-card ${plan.featured ? 'featured' : ''}`} key={plan.name}>
+                  <div className="hosting-name mono">{plan.name}</div>
+                  <div className="hosting-price"><span>$</span>{plan.price}<small>/mo</small></div>
+                  <ul>
+                    {plan.features.map((f) => <li key={f}><Check size={13} />{f}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -336,7 +411,7 @@ function FlowStudio() {
                 </button>
                 {intakeStatus === 'error' && (
                   <p style={{ color: '#a31e22', fontSize: 13 }}>
-                    Something went wrong sending that — try again, or email hello@flowstudio.design directly.
+                    Something went wrong sending that — try again, or email email@flowstudiogrfx.com directly.
                   </p>
                 )}
               </form>
