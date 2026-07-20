@@ -55,7 +55,7 @@ const plans = [
   },
   {
     name: 'Premium',
-    price: '300',
+    price: '275',
     description: 'For brands that need a consistent marketing rhythm.',
     features: ['8 digital flyers per month', '2 revisions per flyer', 'Multiple platform sizes', 'Priority turnaround', 'Captions + promo wording', '1 animated flyer monthly'],
     color: 'light',
