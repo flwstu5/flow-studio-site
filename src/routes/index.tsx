@@ -486,7 +486,7 @@ function FlowStudio() {
                 </button>
                 {intakeStatus === 'error' && (
                   <p style={{ color: '#a31e22', fontSize: 13 }}>
-                    Something went wrong sending that — try again, or email email@flowstudiogrfx.com directly.
+                    Something went wrong sending that — try again, or email admin@flowstudiogrfx.com directly.
                   </p>
                 )}
               </form>
@@ -505,7 +505,7 @@ function FlowStudio() {
             <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
           </a>
           <span className="mono">Independent design studio / © 2026</span>
-          <a className="mono footer-email" href="mailto:email@flowstudiogrfx.com">email@flowstudiogrfx.com</a>
+          <a className="mono footer-email" href="mailto:admin@flowstudiogrfx.com">admin@flowstudiogrfx.com</a>
         </div>
       </footer>
     </main>
