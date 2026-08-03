@@ -20,24 +20,26 @@ function getAdminClient() {
 }
 
 async function sendEmail(params: { to: string; replyTo?: string; subject: string; html: string }) {
-  const apiKey = process.env.RESEND_API_KEY
+  const apiKey = process.env.MAILGUN_API_KEY
+  const domain = process.env.MAILGUN_DOMAIN || 'flowstudiogrfx.com'
   if (!apiKey) {
     throw new Error('Email service is not configured.')
   }
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const form = new URLSearchParams()
+  form.set('from', 'Flow Studio <admin@flowstudiogrfx.com>')
+  form.set('to', params.to)
+  form.set('subject', params.subject)
+  form.set('html', params.html)
+  if (params.replyTo) form.set('h:Reply-To', params.replyTo)
+
+  const res = await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
+      Authorization: `Basic ${btoa(`api:${apiKey}`)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: JSON.stringify({
-      from: 'Flow Studio <onboarding@resend.dev>',
-      to: params.to,
-      reply_to: params.replyTo,
-      subject: params.subject,
-      html: params.html,
-    }),
+    body: form.toString(),
   })
 
   if (!res.ok) {
@@ -49,33 +51,11 @@ async function sendEmail(params: { to: string; replyTo?: string; subject: string
 export const submitIntake = createServerFn({ method: 'POST' })
   .inputValidator(IntakeSchema)
   .handler(async ({ data }) => {
-    // 1. Email you the full brief. This MUST succeed for the submission to
-    // count as successful — it's the actual lead notification.
-    // NOTE: using your personal email here since hello@flowstudio.design
-    // isn't a real inbox yet. Update this once you have a verified domain
-    // and a real business inbox set up.
-    const briefHtml = `
-      <h2>New project brief</h2>
-      <p><strong>Name:</strong> ${data.name}</p>
-      <p><strong>Email:</strong> ${data.email}</p>
-      <p><strong>Business:</strong> ${data.business}</p>
-      <p><strong>Service type:</strong> ${data.serviceType}</p>
-      <p><strong>Budget:</strong> ${data.budget}</p>
-      <p><strong>Brief:</strong></p>
-      <p>${data.message.replace(/\n/g, '<br />')}</p>
-    `
-    await sendEmail({
-      to: 'denzaylewilliams@gmail.com',
-      replyTo: data.email,
-      subject: `New project brief — ${data.serviceType}`,
-      html: briefHtml,
-    })
-
-    // 2. Create their portal account, same as subscribers get automatically.
-    // Wrapped so that any failure here (including the welcome email below,
-    // which will currently fail for anyone but your own Resend-registered
-    // address until a domain is verified) doesn't break the submission —
-    // the lead notification above already succeeded, so nothing is lost.
+    // 1. Create their portal account, same as subscribers get automatically.
+    // Fully wrapped so nothing here can throw — a failure just gets folded
+    // into a status note that rides along in the lead email below, instead
+    // of disappearing into a server log nobody checks.
+    let onboardingNote = ''
     try {
       const supabase = getAdminClient()
 
@@ -85,14 +65,16 @@ export const submitIntake = createServerFn({ method: 'POST' })
         .eq('email', data.email)
         .maybeSingle()
 
-      if (!existing) {
+      if (existing) {
+        onboardingNote = 'Portal account already existed for this email — no changes made.'
+      } else {
         const { data: created, error: createError } = await supabase.auth.admin.createUser({
           email: data.email,
           email_confirm: true,
         })
 
         if (createError) {
-          console.error('Failed to create portal account:', createError.message)
+          onboardingNote = `⚠️ Portal account creation FAILED: ${createError.message}. Set them up manually.`
         } else {
           await supabase.from('clients').insert({
             auth_user_id: created.user.id,
@@ -102,9 +84,9 @@ export const submitIntake = createServerFn({ method: 'POST' })
             tier: null,
           })
 
-          // Welcome email to the client — will currently fail for any email
-          // other than your own until a domain is verified in Resend. That's
-          // expected and caught below, not a bug.
+          // Welcome email to the client — sent via Mailgun from admin@flowstudiogrfx.com.
+          // Still wrapped in its own try/catch so a failure here never breaks
+          // the submission; the note below is what surfaces it to you.
           try {
             await sendEmail({
               to: data.email,
@@ -113,17 +95,43 @@ export const submitIntake = createServerFn({ method: 'POST' })
                 <h2>Thanks, ${data.name}!</h2>
                 <p>We received your project brief and will be in touch shortly.</p>
                 <p>You also now have access to your client portal, where you'll be able to track this project and any files we send your way.</p>
-                <p><a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Log in here</a> using this email address (${data.email}) — you'll receive a one-time code, no password needed.</p>
+                <p><a href="https://portal.flowstudiogrfx.com/login">Log in here</a> using this email address (${data.email}) — you'll receive a one-time code, no password needed.</p>
               `,
             })
+            onboardingNote = 'Portal account created and welcome email sent successfully.'
           } catch (welcomeEmailError) {
-            console.error('Welcome email not sent (expected until domain verified):', welcomeEmailError)
+            const reason = welcomeEmailError instanceof Error ? welcomeEmailError.message : String(welcomeEmailError)
+            onboardingNote = `⚠️ Portal account was created, but the welcome email FAILED to send (${reason}). This client doesn't know they have a portal login yet — check your Mailgun domain/API key, then invite them manually in the meantime.`
           }
         }
       }
     } catch (accountError) {
-      console.error('Portal account creation step failed:', accountError)
+      const reason = accountError instanceof Error ? accountError.message : String(accountError)
+      onboardingNote = `⚠️ Portal onboarding step failed entirely: ${reason}. Set them up manually.`
     }
+
+    // 2. Email you the full brief, plus the onboarding status above. This MUST
+    // succeed for the submission to count as successful — it's the actual
+    // lead notification, and now it's also the only place you'll see whether
+    // this client actually got their portal invite.
+    const briefHtml = `
+      <h2>New project brief</h2>
+      <p><strong>Name:</strong> ${data.name}</p>
+      <p><strong>Email:</strong> ${data.email}</p>
+      <p><strong>Business:</strong> ${data.business}</p>
+      <p><strong>Service type:</strong> ${data.serviceType}</p>
+      <p><strong>Budget:</strong> ${data.budget}</p>
+      <p><strong>Brief:</strong></p>
+      <p>${data.message.replace(/\n/g, '<br />')}</p>
+      <hr />
+      <p><strong>Portal onboarding status:</strong><br />${onboardingNote}</p>
+    `
+    await sendEmail({
+      to: 'admin@flowstudiogrfx.com',
+      replyTo: data.email,
+      subject: `New project brief — ${data.serviceType}`,
+      html: briefHtml,
+    })
 
     return { success: true }
   })

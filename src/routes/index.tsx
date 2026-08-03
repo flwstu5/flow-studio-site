@@ -42,6 +42,7 @@ const plans = [
     features: ['2 digital flyers per month', '1 revision per flyer', '48–72 hour turnaround', 'Instagram + Facebook sizes'],
     color: 'dark',
     checkoutUrl: 'https://buy.stripe.com/9B6cN40NN0CSg1Q16c9sk00',
+    askFirst: 'Have a question before you buy?',
   },
   {
     name: 'Growth',
@@ -52,6 +53,7 @@ const plans = [
     color: 'mid',
     featured: true,
     checkoutUrl: 'https://buy.stripe.com/9B68wObsrbhwcPE5ms9sk01',
+    askFirst: 'Not sure yet? Ask us first',
   },
   {
     name: 'Premium',
@@ -60,6 +62,7 @@ const plans = [
     features: ['8 digital flyers per month', '2 revisions per flyer', 'Multiple platform sizes', 'Priority turnaround', 'Captions + promo wording', '1 animated flyer monthly'],
     color: 'light',
     checkoutUrl: 'https://buy.stripe.com/3cIfZg2VV1GWg1Q0289sk02',
+    askFirst: 'Have a question before you buy?',
   },
 ]
 
@@ -71,6 +74,7 @@ const websitePlans = [
     features: ['1-page custom layout', 'Mobile optimized', 'Contact form included', '1 week turnaround', '1 round of revisions'],
     color: 'dark',
     checkoutUrl: 'https://buy.stripe.com/aFabJ0bsretI8zobKQ9sk03',
+    askFirst: 'Have a question before you buy?',
   },
   {
     name: 'Growth Site',
@@ -81,6 +85,7 @@ const websitePlans = [
     color: 'mid',
     featured: true,
     checkoutUrl: 'https://buy.stripe.com/28E14m0NNgBQ5nc3ek9sk04',
+    askFirst: 'Not sure yet? Ask us first',
   },
   {
     name: 'Full Custom Build',
@@ -104,6 +109,37 @@ const steps = [
   ['Revise & ship', 'Request changes if needed, then download polished print- and web-ready files.'],
 ]
 
+const faqs = [
+  {
+    q: 'What happens right after I pay?',
+    a: "You'll get a portal login within one business day, plus a short intake form so we can lock in scope — brand assets, references, deadlines. Website projects start with a kickoff note; flyer subscriptions start taking requests immediately.",
+  },
+  {
+    q: "What if I don't like the first draft?",
+    a: "Every tier includes revision rounds — use them. Tell us specifically what's off (color, layout, tone) and we'll redraw it. If a flyer or site genuinely misses the brief after all included revisions, flag it and we'll make it right before you spend an extra dollar.",
+  },
+  {
+    q: 'Who owns the final files?',
+    a: 'You do. Once a project is paid in full, the delivered files — logo, site code, flyer assets — are yours to use anywhere. Subscription flyers are yours to keep even if you later pause or cancel.',
+  },
+  {
+    q: 'Can I cancel or pause the flyer subscription?',
+    a: "Anytime. No contracts. Pause when things are quiet, resume when they're not — you'll only be billed for active months.",
+  },
+  {
+    q: 'Do I have to buy hosting with a website project?',
+    a: 'No. Hosting plans are optional. Take your finished site anywhere, or let us keep it fast and updated for a flat monthly fee.',
+  },
+  {
+    q: 'How fast is turnaround, really?',
+    a: "Flyer drafts land per your plan's stated window (48–72 hrs on Starter, faster on Growth/Premium). Website timelines are 1 week (Starter Site) to 2–3 weeks (Growth Site); Full Custom Build timelines are scoped per project.",
+  },
+  {
+    q: "What if I'm not sure which package fits?",
+    a: 'Email us or use "Ask us first" next to any package above — a two-minute reply beats guessing.',
+  },
+]
+
 function RegMark({ position }: { position: string }) {
   return (
     <svg className={`regmark ${position}`} viewBox="0 0 24 24" aria-hidden="true">
@@ -115,6 +151,7 @@ function RegMark({ position }: { position: string }) {
 
 function FlowStudio() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
   const [intakeForm, setIntakeForm] = useState({
     name: '',
     email: '',
@@ -184,6 +221,15 @@ function FlowStudio() {
     return () => reveal.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!lightbox) return
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setLightbox(null)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [lightbox])
+
   const closeMenu = () => setMenuOpen(false)
 
   return (
@@ -198,6 +244,7 @@ function FlowStudio() {
             <a href="#subscription">Flyer subscription</a>
             <a href="#websites">Website pricing</a>
             <a href="#how">How it works</a>
+            <a href="#faq">FAQ</a>
             <a href="#work">Work</a>
             <a className="nav-login" href="https://portal.flowstudiogrfx.com/login">Client login</a>
             <a className="nav-cta" href="#intake">Start a project <ArrowRight size={14} /></a>
@@ -211,6 +258,7 @@ function FlowStudio() {
           <a href="#subscription" onClick={closeMenu}>Flyer subscription</a>
           <a href="#websites" onClick={closeMenu}>Website pricing</a>
           <a href="#how" onClick={closeMenu}>How it works</a>
+          <a href="#faq" onClick={closeMenu}>FAQ</a>
           <a href="#work" onClick={closeMenu}>Work</a>
           <a href="https://portal.flowstudiogrfx.com/login" onClick={closeMenu}>Client login</a>
           <a href="#intake" onClick={closeMenu}>Start a project <ArrowRight size={16} /></a>
@@ -287,6 +335,14 @@ function FlowStudio() {
                   {plan.features.map((feature) => <li key={feature}><Check size={15} />{feature}</li>)}
                 </ul>
                 <a href={plan.checkoutUrl} className={`button ${plan.featured ? 'button-paper' : 'button-outline'}`}>Choose {plan.name}<ArrowRight size={16} /></a>
+                {plan.askFirst && (
+                  <a
+                    className="ask-first"
+                    href={`mailto:admin@flowstudiogrfx.com?subject=${encodeURIComponent(`Question about ${plan.name} plan`)}`}
+                  >
+                    {plan.askFirst} →
+                  </a>
+                )}
               </article>
             ))}
           </div>
@@ -322,6 +378,14 @@ function FlowStudio() {
                   <a href={plan.checkoutUrl} className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Get started<ArrowRight size={16} /></a>
                 ) : (
                   <a href="#custom-build" className={`button ${plan.featured ? 'button-solid' : 'button-outline'}`}>Tell us about your project<ArrowRight size={16} /></a>
+                )}
+                {plan.askFirst && (
+                  <a
+                    className="ask-first"
+                    href={`mailto:admin@flowstudiogrfx.com?subject=${encodeURIComponent(`Question about ${plan.name}`)}`}
+                  >
+                    {plan.askFirst} →
+                  </a>
                 )}
               </article>
             ))}
@@ -398,6 +462,24 @@ function FlowStudio() {
         </div>
       </section>
 
+      <section className="faq section" id="faq">
+        <div className="wrap reveal">
+          <p className="section-label mono">03.5 / Before you sign</p>
+          <div className="section-heading">
+            <h2 className="display">A few things<br />worth knowing.</h2>
+            <p>The questions we get most, answered up front.</p>
+          </div>
+          <div className="faq-list">
+            {faqs.map((item) => (
+              <details className="faq-item" key={item.q}>
+                <summary className="faq-question">{item.q}</summary>
+                <p className="faq-answer">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="work section" id="work">
         <div className="wrap reveal">
           <p className="section-label mono">04 / Selected work</p>
@@ -406,18 +488,35 @@ function FlowStudio() {
             <p>A mix of identities, websites, and campaign work made to be seen in the real world.</p>
           </div>
           <div className="work-grid">
-            <article className="work-card work-brand">
-              <div className="poster-brand"><span>LOW<br />TIDE</span><small>COFFEE CO.</small></div>
-              <div className="work-caption"><span>Low Tide Coffee</span><small className="mono">Brand identity / 2026</small></div>
-            </article>
-            <article className="work-card work-web">
-              <div className="browser"><div className="browser-bar"><i /><i /><i /></div><div className="browser-body"><span>FORM / 07</span><strong>Objects for<br />quiet rooms.</strong><button>Explore collection</button></div></div>
-              <div className="work-caption"><span>Form House</span><small className="mono">Web design / 2026</small></div>
-            </article>
-            <article className="work-card work-flyer">
-              <div className="flyer-stack"><div className="flyer back">FRI<br />28</div><div className="flyer front"><small>AFTER DARK</small><strong>HOUSE<br />GUESTS</strong><span>10PM — LATE</span></div></div>
-              <div className="work-caption"><span>House Guests</span><small className="mono">Flyer series / 2025</small></div>
-            </article>
+            <button
+              type="button"
+              className="work-card work-brand"
+              onClick={() => setLightbox({ src: '/work-logo-hall-of-fame.png', alt: 'Hall of Fame Pet Care logo mark' })}
+            >
+              <div className="poster-brand poster-image">
+                <img src="/work-logo-hall-of-fame.png" alt="Hall of Fame Pet Care logo mark" />
+              </div>
+              <div className="work-caption"><span>Hall of Fame Pet Care</span><small className="mono">Logo &amp; brand design</small></div>
+            </button>
+            <a className="work-card work-web" href="https://www.outthemudhauling.com" target="_blank" rel="noopener noreferrer">
+              <div className="browser">
+                <div className="browser-bar"><i /><i /><i /></div>
+                <div className="browser-body browser-image">
+                  <img src="/work-web-out-the-mud.jpg" alt="Out The Mud Hauling homepage hero" />
+                </div>
+              </div>
+              <div className="work-caption"><span>Out The Mud Hauling</span><small className="mono">Web design</small></div>
+            </a>
+            <button
+              type="button"
+              className="work-card work-flyer"
+              onClick={() => setLightbox({ src: '/work-flyer-designer-dinners.jpg', alt: 'Designer Dinners by Jaq flyer' })}
+            >
+              <div className="flyer-stack flyer-image">
+                <img src="/work-flyer-designer-dinners.jpg" alt="Designer Dinners by Jaq flyer" />
+              </div>
+              <div className="work-caption"><span>Designer Dinners by Jaq</span><small className="mono">Flyer design</small></div>
+            </button>
           </div>
         </div>
       </section>
@@ -505,9 +604,21 @@ function FlowStudio() {
             <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
           </a>
           <span className="mono">Independent design studio / © 2026</span>
-          <a className="mono footer-email" href="mailto:admin@flowstudiogrfx.com">admin@flowstudiogrfx.com</a>
+          <div className="footer-contact">
+            <a className="mono footer-email" href="mailto:admin@flowstudiogrfx.com">admin@flowstudiogrfx.com</a>
+            <span className="mono footer-response">We reply within 1 business day</span>
+          </div>
         </div>
       </footer>
+
+      {lightbox && (
+        <div className="lightbox" role="dialog" aria-modal="true" onClick={() => setLightbox(null)}>
+          <button type="button" className="lightbox-close" aria-label="Close" onClick={() => setLightbox(null)}>
+            <X size={22} />
+          </button>
+          <img src={lightbox.src} alt={lightbox.alt} onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </main>
   )
 }
