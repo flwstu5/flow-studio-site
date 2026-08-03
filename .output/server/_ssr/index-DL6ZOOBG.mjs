@@ -70,7 +70,7 @@ const services = [{
 }];
 const plans = [{
   name: "Starter",
-  price: "99",
+  price: "70",
   description: "Best for small businesses that post occasionally.",
   features: ["2 digital flyers per month", "1 revision per flyer", "48–72 hour turnaround", "Instagram + Facebook sizes"],
   color: "dark",
@@ -78,7 +78,7 @@ const plans = [{
 }, {
   name: "Growth",
   note: "Best value",
-  price: "175",
+  price: "150",
   description: "Content-ready, with something new to post every week.",
   features: ["4 digital flyers per month", "2 revisions per flyer", "All social media sizes", "Priority turnaround", "Basic captions included"],
   color: "mid",
@@ -86,7 +86,7 @@ const plans = [{
   checkoutUrl: "https://buy.stripe.com/9B68wObsrbhwcPE5ms9sk01"
 }, {
   name: "Premium",
-  price: "300",
+  price: "275",
   description: "For brands that need a consistent marketing rhythm.",
   features: ["8 digital flyers per month", "2 revisions per flyer", "Multiple platform sizes", "Priority turnaround", "Captions + promo wording", "1 animated flyer monthly"],
   color: "light",
@@ -97,7 +97,8 @@ const websitePlans = [{
   price: "900",
   description: "A clean, professional single-page site to get you online fast.",
   features: ["1-page custom layout", "Mobile optimized", "Contact form included", "1 week turnaround", "1 round of revisions"],
-  color: "dark"
+  color: "dark",
+  checkoutUrl: "https://buy.stripe.com/aFabJ0bsretI8zobKQ9sk03"
 }, {
   name: "Growth Site",
   note: "Most popular",
@@ -105,7 +106,8 @@ const websitePlans = [{
   description: "A full multi-page site built around your brand and services.",
   features: ["Up to 6 pages", "Fully custom design", "SEO setup included", "2 rounds of revisions", "2–3 week turnaround", "30 days of post-launch tweaks"],
   color: "mid",
-  featured: true
+  featured: true,
+  checkoutUrl: "https://buy.stripe.com/28E14m0NNgBQ5nc3ek9sk04"
 }, {
   name: "Full Custom Build",
   price: "4,500+",
@@ -147,8 +149,24 @@ function FlowStudio() {
     message: ""
   });
   const [intakeStatus, setIntakeStatus] = reactExports.useState("idle");
+  const [customForm, setCustomForm] = reactExports.useState({
+    name: "",
+    email: "",
+    business: "",
+    currentSite: "",
+    goals: "",
+    budget: "",
+    timeline: ""
+  });
+  const [customStatus, setCustomStatus] = reactExports.useState("idle");
   function updateIntakeField(field, value) {
     setIntakeForm((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+  }
+  function updateCustomField(field, value) {
+    setCustomForm((prev) => ({
       ...prev,
       [field]: value
     }));
@@ -163,6 +181,29 @@ function FlowStudio() {
       setIntakeStatus("sent");
     } catch {
       setIntakeStatus("error");
+    }
+  }
+  async function handleCustomSubmit(e) {
+    e.preventDefault();
+    setCustomStatus("sending");
+    try {
+      await submitIntake({
+        data: {
+          name: customForm.name,
+          email: customForm.email,
+          business: customForm.business,
+          serviceType: "Full Custom Website Build",
+          budget: customForm.budget,
+          message: `Current site: ${customForm.currentSite || "None"}
+Timeline: ${customForm.timeline}
+
+Goals & why they need a full custom build:
+${customForm.goals}`
+        }
+      });
+      setCustomStatus("sent");
+    } catch {
+      setCustomStatus("error");
     }
   }
   reactExports.useEffect(() => {
@@ -183,7 +224,7 @@ function FlowStudio() {
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#websites", children: "Website pricing" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#how", children: "How it works" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#work", children: "Work" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "nav-login", href: "https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login", children: "Client login" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "nav-login", href: "https://portal.flowstudiogrfx.com/login", children: "Client login" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { className: "nav-cta", href: "#intake", children: [
             "Start a project ",
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 14 })
@@ -197,7 +238,7 @@ function FlowStudio() {
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#websites", onClick: closeMenu, children: "Website pricing" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#how", onClick: closeMenu, children: "How it works" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#work", onClick: closeMenu, children: "Work" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login", onClick: closeMenu, children: "Client login" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://portal.flowstudiogrfx.com/login", onClick: closeMenu, children: "Client login" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "#intake", onClick: closeMenu, children: [
           "Start a project ",
           /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 16 })
@@ -364,8 +405,11 @@ function FlowStudio() {
           /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { size: 15 }),
           feature
         ] }, feature)) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "#intake", className: `button ${plan.featured ? "button-solid" : "button-outline"}`, children: [
+        plan.checkoutUrl ? /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: plan.checkoutUrl, className: `button ${plan.featured ? "button-solid" : "button-outline"}`, children: [
           "Get started",
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 16 })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "#custom-build", className: `button ${plan.featured ? "button-solid" : "button-outline"}`, children: [
+          "Tell us about your project",
           /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 16 })
         ] })
       ] }, plan.name)) }),
@@ -386,6 +430,43 @@ function FlowStudio() {
             f
           ] }, f)) })
         ] }, plan.name)) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "custom-build-form", id: "custom-build", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "section-label mono", style: {
+          marginTop: 70
+        }, children: "Full Custom Build / Project scoping" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "section-heading", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "display", children: [
+            "Tell us what",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+            "you need built."
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Custom builds start with a conversation — walk us through your goals so we can scope it accurately." })
+        ] }),
+        customStatus === "sent" ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
+          fontWeight: 600
+        }, children: "Got it — thanks! We'll review your project and follow up shortly." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleCustomSubmit, style: {
+          display: "grid",
+          gap: 14,
+          maxWidth: 560
+        }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Your name", value: customForm.name, onChange: (e) => updateCustomField("name", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, type: "email", placeholder: "Email address", value: customForm.email, onChange: (e) => updateCustomField("email", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Business / brand name", value: customForm.business, onChange: (e) => updateCustomField("business", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { placeholder: "Current website (if any)", value: customForm.currentSite, onChange: (e) => updateCustomField("currentSite", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Ideal timeline (e.g. 6 weeks, flexible)", value: customForm.timeline, onChange: (e) => updateCustomField("timeline", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { required: true, placeholder: "Budget range", value: customForm.budget, onChange: (e) => updateCustomField("budget", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("textarea", { required: true, rows: 5, placeholder: "What are you building, and why does it need a full custom build? (integrations, animations, complex features, etc.)", value: customForm.goals, onChange: (e) => updateCustomField("goals", e.target.value) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "submit", className: "button button-solid", disabled: customStatus === "sending", children: [
+            customStatus === "sending" ? "Sending…" : "Submit project details",
+            " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { size: 17 })
+          ] }),
+          customStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
+            color: "#a31e22",
+            fontSize: 13
+          }, children: "Something went wrong — try again, or email admin@flowstudiogrfx.com directly." })
+        ] })
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "how section", id: "how", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap reveal", children: [
@@ -524,7 +605,7 @@ function FlowStudio() {
         intakeStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
           color: "#a31e22",
           fontSize: 13
-        }, children: "Something went wrong sending that — try again, or email email@flowstudiogrfx.com directly." })
+        }, children: "Something went wrong sending that — try again, or email admin@flowstudiogrfx.com directly." })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "button-row centered", style: {
         marginTop: 20
@@ -533,7 +614,7 @@ function FlowStudio() {
     /* @__PURE__ */ jsxRuntimeExports.jsx("footer", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "wrap footer-inner", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "logo footer-logo", href: "#top", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: "/logo-full1.png", alt: "Flow Studio", className: "logo-image" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mono", children: "Independent design studio / © 2026" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "mono footer-email", href: "mailto:email@flowstudiogrfx.com", children: "email@flowstudiogrfx.com" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "mono footer-email", href: "mailto:admin@flowstudiogrfx.com", children: "admin@flowstudiogrfx.com" })
     ] }) })
   ] });
 }

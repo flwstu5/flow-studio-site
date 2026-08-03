@@ -199,7 +199,7 @@ function FlowStudio() {
             <a href="#websites">Website pricing</a>
             <a href="#how">How it works</a>
             <a href="#work">Work</a>
-            <a className="nav-login" href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login">Client login</a>
+            <a className="nav-login" href="https://portal.flowstudiogrfx.com/login">Client login</a>
             <a className="nav-cta" href="#intake">Start a project <ArrowRight size={14} /></a>
           </nav>
           <button className="menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">
@@ -212,7 +212,7 @@ function FlowStudio() {
           <a href="#websites" onClick={closeMenu}>Website pricing</a>
           <a href="#how" onClick={closeMenu}>How it works</a>
           <a href="#work" onClick={closeMenu}>Work</a>
-          <a href="https://flow-studio-portal-e19up3nkk-fl-ow-studio.vercel.app/login" onClick={closeMenu}>Client login</a>
+          <a href="https://portal.flowstudiogrfx.com/login" onClick={closeMenu}>Client login</a>
           <a href="#intake" onClick={closeMenu}>Start a project <ArrowRight size={16} /></a>
         </nav>
       </header>
@@ -371,7 +371,7 @@ function FlowStudio() {
                   {customStatus === 'sending' ? 'Sending…' : 'Submit project details'} <ArrowRight size={17} />
                 </button>
                 {customStatus === 'error' && (
-                  <p style={{ color: '#a31e22', fontSize: 13 }}>Something went wrong — try again, or email email@flowstudiogrfx.com directly.</p>
+                  <p style={{ color: '#a31e22', fontSize: 13 }}>Something went wrong — try again, or email admin@flowstudiogrfx.com directly.</p>
                 )}
               </form>
             )}
