@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
-import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { sendEmail } from './email'
+import { getAdminClient } from './supabaseAdmin'
 
 const IntakeSchema = z.object({
   name: z.string().min(1),
@@ -11,14 +11,6 @@ const IntakeSchema = z.object({
   message: z.string().min(1),
   email: z.string().email(),
 })
-
-function getAdminClient() {
-  return createClient(
-    process.env.SUPABASE_URL as string,
-    process.env.SUPABASE_SECRET_KEY as string,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
-}
 
 export const submitIntake = createServerFn({ method: 'POST' })
   .inputValidator(IntakeSchema)

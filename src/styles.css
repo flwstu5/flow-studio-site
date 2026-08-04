@@ -263,6 +263,30 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .status-warn { color: var(--red-mid); }
 .status-fail { color: var(--red-dark); }
 .status-unknown { color: var(--ink-soft); }
+
+.snapshot-report-head { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+.grade-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 76px; height: 76px; flex: 0 0 auto; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper-bright); }
+.grade-badge .grade-letter { font-family: var(--display); font-size: 28px; line-height: 1; }
+.grade-badge .grade-percent { font-size: 9px; color: var(--ink-soft); margin-top: 2px; }
+.grade-badge.good { border-color: #2f7d4f; }
+.grade-badge.good .grade-letter { color: #2f7d4f; }
+.grade-badge.ok { border-color: var(--red-mid); }
+.grade-badge.ok .grade-letter { color: var(--red-mid); }
+.grade-badge.poor { border-color: var(--red-dark); }
+.grade-badge.poor .grade-letter { color: var(--red-dark); }
+.snapshot-report-head-text { flex: 1 1 auto; min-width: 200px; }
+.snapshot-report-url { margin: 0 0 4px; font-size: 11px; color: var(--red-dark); }
+.snapshot-report-summary { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.snapshot-report-head .button { flex: 0 0 auto; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .snapshot-hero { min-height: 0; padding: 20px 0; }
+  .snapshot-results { max-width: 100%; }
+  .snapshot-check, .score-card, .comparison-table-wrap { break-inside: avoid; box-shadow: none !important; }
+}
+
 .website-grid .plan:not(.featured) .ask-first { color: #d8d3ca; }
 .website-grid .plan:not(.featured) .ask-first:hover { color: #fff; }
 

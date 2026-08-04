@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ArrowRight, CircleCheck, TriangleAlert, CircleX, Minus } from 'lucide-react'
+import { ArrowRight, CircleCheck, TriangleAlert, CircleX, Minus, Download } from 'lucide-react'
 import { runSnapshot } from '../server/snapshot'
 
 export const Route = createFileRoute('/snapshot')({
@@ -10,12 +10,15 @@ export const Route = createFileRoute('/snapshot')({
 type CheckStatus = 'pass' | 'warn' | 'fail'
 type CheckResult = { id: string; label: string; status: CheckStatus; detail: string }
 type PageSpeedScores = { performance: number; seo: number; accessibility: number }
+type Reviews = { rating: number | null; count: number | null }
+type Grade = { percent: number; letter: string }
 type CompetitorResult = {
   label: string
   url: string
   ok: boolean
   pageSpeed: PageSpeedScores | null
   checks: CheckResult[]
+  reviews: Reviews | null
 }
 type SnapshotResult =
   | {
@@ -23,6 +26,8 @@ type SnapshotResult =
       url: string
       pageSpeed: PageSpeedScores | null
       checks: CheckResult[]
+      grade: Grade
+      reviews: Reviews | null
       competitorSource: 'manual' | 'auto' | 'none'
       competitors: CompetitorResult[]
     }
@@ -34,6 +39,21 @@ function SnapshotPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [result, setResult] = useState<SnapshotResult | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
+
+  // Supports staff deep-linking from the portal: /snapshot?url=...&email=...&business=...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const url = params.get('url')
+    const email = params.get('email')
+    const business = params.get('business')
+    if (!url && !email && !business) return
+    setForm((prev) => ({
+      ...prev,
+      url: url ?? prev.url,
+      email: email ?? prev.email,
+      business: business ?? prev.business,
+    }))
+  }, [])
 
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -64,7 +84,7 @@ function SnapshotPage() {
 
   return (
     <main>
-      <header className="site-header">
+      <header className="site-header no-print">
         <div className="wrap nav-inner">
           <a className="logo" href="/" aria-label="Flow Studio home">
             <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
@@ -80,8 +100,8 @@ function SnapshotPage() {
 
       <section className="snapshot-hero section">
         <div className="wrap">
-          <p className="section-label mono">Free tool</p>
-          <div className="section-heading">
+          <p className="section-label mono no-print">Free tool</p>
+          <div className="section-heading no-print">
             <h1 className="display">What's your site<br />missing?</h1>
             <p>Drop in your website and we'll check it for the SEO and site-health basics that affect whether people actually find you — free, no strings.</p>
           </div>
@@ -139,13 +159,33 @@ function SnapshotPage() {
           )}
 
           {status === 'done' && result?.ok && (
-            <div className="snapshot-results">
+            <div className="snapshot-results" id="snapshot-report">
+              <div className="snapshot-report-head">
+                <GradeBadge grade={result.grade} />
+                <div className="snapshot-report-head-text">
+                  <p className="mono snapshot-report-url">{result.url}</p>
+                  <p className="snapshot-report-summary">
+                    {opportunities.length} opportunit{opportunities.length === 1 ? 'y' : 'ies'} found · {wins.length} thing{wins.length === 1 ? '' : 's'} already working
+                  </p>
+                </div>
+                <button type="button" className="button button-outline no-print" onClick={() => window.print()}>
+                  <Download size={15} /> Download PDF
+                </button>
+              </div>
+
               {result.pageSpeed && (
                 <div className="snapshot-scores">
                   <ScoreCard label="Performance" value={result.pageSpeed.performance} />
                   <ScoreCard label="SEO" value={result.pageSpeed.seo} />
                   <ScoreCard label="Accessibility" value={result.pageSpeed.accessibility} />
                 </div>
+              )}
+
+              {result.reviews && (
+                <p className="snapshot-check-detail" style={{ marginBottom: 20 }}>
+                  Google rating: <strong>{result.reviews.rating ?? '—'}★</strong> from{' '}
+                  <strong>{result.reviews.count ?? 0}</strong> review{result.reviews.count === 1 ? '' : 's'}.
+                </p>
               )}
 
               {opportunities.length > 0 && (
@@ -200,7 +240,7 @@ function SnapshotPage() {
                 </div>
               )}
 
-              <div className="snapshot-cta">
+              <div className="snapshot-cta no-print">
                 <p>We just emailed a copy of this to our team — if you'd like help fixing any of this, let's talk.</p>
                 <a href="/#intake" className="button button-solid">Start a project <ArrowRight size={16} /></a>
               </div>
@@ -209,7 +249,7 @@ function SnapshotPage() {
         </div>
       </section>
 
-      <footer>
+      <footer className="no-print">
         <div className="wrap footer-inner">
           <a className="logo footer-logo" href="/">
             <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
@@ -222,6 +262,16 @@ function SnapshotPage() {
         </div>
       </footer>
     </main>
+  )
+}
+
+function GradeBadge({ grade }: { grade: Grade }) {
+  const tier = grade.percent >= 90 ? 'good' : grade.percent >= 70 ? 'ok' : 'poor'
+  return (
+    <div className={`grade-badge ${tier}`}>
+      <span className="grade-letter">{grade.letter}</span>
+      <span className="grade-percent mono">{grade.percent}%</span>
+    </div>
   )
 }
 
@@ -246,7 +296,7 @@ function ComparisonTable({
   primary,
   competitors,
 }: {
-  primary: { url: string; pageSpeed: PageSpeedScores | null; checks: CheckResult[] }
+  primary: { url: string; pageSpeed: PageSpeedScores | null; reviews: Reviews | null; checks: CheckResult[] }
   competitors: CompetitorResult[]
 }) {
   function findStatus(checks: CheckResult[], id: string) {
@@ -300,6 +350,20 @@ function ComparisonTable({
               </tr>
             </>
           )}
+          <tr>
+            <td>Google rating</td>
+            <td>{primary.reviews?.rating ?? '—'}</td>
+            {competitors.map((c) => (
+              <td key={c.url}>{c.reviews?.rating ?? '—'}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>Review count</td>
+            <td>{primary.reviews?.count ?? '—'}</td>
+            {competitors.map((c) => (
+              <td key={c.url}>{c.reviews?.count ?? '—'}</td>
+            ))}
+          </tr>
         </tbody>
       </table>
     </div>

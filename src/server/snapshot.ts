@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { sendEmail } from './email'
+import { getAdminClient } from './supabaseAdmin'
 
 const SnapshotSchema = z.object({
   url: z.string().min(1),
@@ -142,6 +143,26 @@ function runOnPageChecks(html: string, finalUrl: string): CheckResult[] {
     detail: hasFavicon ? 'Favicon tag found.' : 'No favicon link found in the page head.',
   })
 
+  const socialPlatforms: { name: string; pattern: RegExp }[] = [
+    { name: 'Facebook', pattern: /facebook\.com\// },
+    { name: 'Instagram', pattern: /instagram\.com\// },
+    { name: 'LinkedIn', pattern: /linkedin\.com\// },
+    { name: 'X/Twitter', pattern: /(?:twitter\.com|x\.com)\// },
+    { name: 'TikTok', pattern: /tiktok\.com\// },
+    { name: 'YouTube', pattern: /youtube\.com\// },
+  ]
+  const hrefs = [...html.matchAll(/href=["']([^"']+)["']/gi)].map((m) => m[1])
+  const foundPlatforms = socialPlatforms.filter((p) => hrefs.some((h) => p.pattern.test(h)))
+  checks.push({
+    id: 'social-links',
+    label: 'Social profiles linked',
+    status: foundPlatforms.length >= 3 ? 'pass' : foundPlatforms.length >= 1 ? 'warn' : 'fail',
+    detail:
+      foundPlatforms.length > 0
+        ? `Linked to ${foundPlatforms.length} of 6 major platforms (${foundPlatforms.map((p) => p.name).join(', ')}).`
+        : 'No links to Facebook, Instagram, LinkedIn, X, TikTok, or YouTube found on the page.',
+  })
+
   return checks
 }
 
@@ -222,11 +243,21 @@ function safeHostname(url: string) {
   }
 }
 
-async function findCompetitors(context: BusinessContext, excludeUrl: string): Promise<string[]> {
+type PlaceInfo = {
+  websiteUri: string | null
+  displayName: string | null
+  rating: number | null
+  userRatingCount: number | null
+  businessStatus: string | null
+}
+
+// One search does double duty: it's how we auto-discover competitors AND
+// how we find the business's own Google Business Profile (by matching a
+// result's website back to the site we just scanned). Requesting rating +
+// review count bumps this into the Enterprise+Atmosphere field tier.
+async function searchNearbyBusinesses(context: BusinessContext): Promise<PlaceInfo[]> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) return []
-
-  const excludeHost = safeHostname(excludeUrl)
 
   try {
     const controller = new AbortController()
@@ -237,11 +268,12 @@ async function findCompetitors(context: BusinessContext, excludeUrl: string): Pr
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.websiteUri,places.displayName',
+        'X-Goog-FieldMask':
+          'places.websiteUri,places.displayName,places.rating,places.userRatingCount,places.businessStatus',
       },
       body: JSON.stringify({
         textQuery: `${context.category} in ${context.locality}`,
-        maxResultCount: 6,
+        maxResultCount: 10,
       }),
     })
     clearTimeout(timeout)
@@ -250,20 +282,36 @@ async function findCompetitors(context: BusinessContext, excludeUrl: string): Pr
     const data = await res.json()
     const places = Array.isArray(data?.places) ? data.places : []
 
-    const urls: string[] = []
-    for (const place of places) {
-      const site = place?.websiteUri
-      if (typeof site !== 'string') continue
-      const host = safeHostname(site)
-      if (!host || host === excludeHost) continue
-      if (urls.some((u) => safeHostname(u) === host)) continue
-      urls.push(site)
-      if (urls.length >= 2) break
-    }
-    return urls
+    return places.map((p: any): PlaceInfo => ({
+      websiteUri: typeof p?.websiteUri === 'string' ? p.websiteUri : null,
+      displayName: typeof p?.displayName?.text === 'string' ? p.displayName.text : null,
+      rating: typeof p?.rating === 'number' ? p.rating : null,
+      userRatingCount: typeof p?.userRatingCount === 'number' ? p.userRatingCount : null,
+      businessStatus: typeof p?.businessStatus === 'string' ? p.businessStatus : null,
+    }))
   } catch {
     return []
   }
+}
+
+function pickCompetitorUrls(places: PlaceInfo[], excludeHost: string | null): string[] {
+  const urls: string[] = []
+  const seen = new Set<string>()
+  for (const p of places) {
+    if (!p.websiteUri) continue
+    const host = safeHostname(p.websiteUri)
+    if (!host || host === excludeHost || seen.has(host)) continue
+    seen.add(host)
+    urls.push(p.websiteUri)
+    if (urls.length >= 2) break
+  }
+  return urls
+}
+
+function findPlaceForUrl(places: PlaceInfo[], url: string): PlaceInfo | null {
+  const host = safeHostname(url)
+  if (!host) return null
+  return places.find((p) => p.websiteUri && safeHostname(p.websiteUri) === host) ?? null
 }
 
 async function runPageSpeed(url: string): Promise<PageSpeedScores | null> {
@@ -301,6 +349,23 @@ function emailChecklist(checks: CheckResult[]) {
   return checks.map((c) => `<li><strong>${c.status.toUpperCase()}</strong> — ${c.label}: ${c.detail}</li>`).join('')
 }
 
+type Grade = { percent: number; letter: string }
+
+function computeGrade(checks: CheckResult[], pageSpeed: PageSpeedScores | null): Grade {
+  const points = checks.reduce((sum, c) => sum + (c.status === 'pass' ? 2 : c.status === 'warn' ? 1 : 0), 0)
+  const maxPoints = checks.length * 2
+  let ratio = maxPoints > 0 ? points / maxPoints : 0
+
+  if (pageSpeed) {
+    const avg = (pageSpeed.performance + pageSpeed.seo + pageSpeed.accessibility) / 3 / 100
+    ratio = (ratio + avg) / 2
+  }
+
+  const percent = Math.round(ratio * 100)
+  const letter = percent >= 90 ? 'A' : percent >= 80 ? 'B' : percent >= 70 ? 'C' : percent >= 60 ? 'D' : 'F'
+  return { percent, letter }
+}
+
 export const runSnapshot = createServerFn({ method: 'POST' })
   .inputValidator(SnapshotSchema)
   .handler(async ({ data }) => {
@@ -328,10 +393,13 @@ export const runSnapshot = createServerFn({ method: 'POST' })
     )
     let competitorSource: 'manual' | 'auto' | 'none' = competitorUrls.length > 0 ? 'manual' : 'none'
 
-    if (competitorUrls.length === 0) {
-      const context = detectBusinessContext(primary.html)
-      if (context) {
-        const discovered = await findCompetitors(context, primary.url)
+    let nearbyPlaces: PlaceInfo[] = []
+    const context = detectBusinessContext(primary.html)
+    if (context) {
+      nearbyPlaces = await searchNearbyBusinesses(context)
+
+      if (competitorUrls.length === 0) {
+        const discovered = pickCompetitorUrls(nearbyPlaces, safeHostname(primary.url))
         if (discovered.length > 0) {
           competitorUrls = discovered
           competitorSource = 'auto'
@@ -339,7 +407,31 @@ export const runSnapshot = createServerFn({ method: 'POST' })
       }
     }
 
+    const ownListing = nearbyPlaces.length > 0 ? findPlaceForUrl(nearbyPlaces, primary.url) : null
+    if (context) {
+      // Only add this check when we actually had enough info to search —
+      // otherwise "not found" would be a false negative, not a real finding.
+      primary.checks.push(
+        ownListing
+          ? {
+              id: 'gbp',
+              label: 'Google Business Profile',
+              status: ownListing.businessStatus === 'OPERATIONAL' ? 'pass' : 'warn',
+              detail: `Found — ${ownListing.rating ?? '—'}★ (${ownListing.userRatingCount ?? 0} review${ownListing.userRatingCount === 1 ? '' : 's'}).`,
+            }
+          : {
+              id: 'gbp',
+              label: 'Google Business Profile',
+              status: 'warn',
+              detail: "We couldn't find a Google Business Profile linking back to this site nearby — it may be unclaimed, incomplete, or just outside our search match.",
+            },
+      )
+    }
+
     const competitors = await Promise.all(competitorUrls.map((url) => scanSite(url)))
+    const competitorReviews = competitors.map((c) => (c.ok ? findPlaceForUrl(nearbyPlaces, c.url) : null))
+
+    const grade = computeGrade(primary.checks, primary.pageSpeed)
 
     const opportunityCount = primary.checks.filter((c) => c.status !== 'pass').length
 
@@ -366,6 +458,7 @@ export const runSnapshot = createServerFn({ method: 'POST' })
           <p><strong>Business:</strong> ${data.business ?? '—'}</p>
           <p><strong>Site scanned:</strong> ${primary.url}</p>
           ${primary.pageSpeed ? `<p><strong>PageSpeed scores (mobile):</strong> Performance ${primary.pageSpeed.performance}, SEO ${primary.pageSpeed.seo}, Accessibility ${primary.pageSpeed.accessibility}</p>` : '<p><em>PageSpeed scoring not configured — showing on-page checks only.</em></p>'}
+          <p><strong>Overall grade:</strong> ${grade.letter} (${grade.percent}%)</p>
           <ul>${emailChecklist(primary.checks)}</ul>
           ${competitorHtml ? `<hr /><h3>Competitors they're up against (${competitorSource === 'auto' ? 'auto-discovered nearby' : 'submitted manually'})</h3>${competitorHtml}` : ''}
         `,
@@ -375,11 +468,53 @@ export const runSnapshot = createServerFn({ method: 'POST' })
       // failed — the visitor should still see their results.
     }
 
+    const competitorPayload = competitors.map((c, i) => ({
+      url: c.url,
+      ok: c.ok,
+      pageSpeed: c.ok ? c.pageSpeed : null,
+      reviews: competitorReviews[i]
+        ? { rating: competitorReviews[i]!.rating, count: competitorReviews[i]!.userRatingCount }
+        : null,
+    }))
+    const primaryReviews = ownListing ? { rating: ownListing.rating, count: ownListing.userRatingCount } : null
+
+    // If this email belongs to an existing portal client, save the report
+    // so it shows up as a reminder in their dashboard and in staff view.
+    // Best-effort — a save failure here should never break the response
+    // the visitor is waiting on.
+    try {
+      const admin = getAdminClient()
+      const { data: existingClient } = await admin
+        .from('clients')
+        .select('id')
+        .eq('email', data.email)
+        .maybeSingle()
+
+      if (existingClient) {
+        await admin.from('snapshots').insert({
+          client_id: existingClient.id,
+          url: primary.url,
+          grade_letter: grade.letter,
+          grade_percent: grade.percent,
+          opportunity_count: opportunityCount,
+          checks: primary.checks,
+          page_speed: primary.pageSpeed,
+          reviews: primaryReviews,
+          competitors: competitorPayload,
+        })
+      }
+    } catch {
+      // snapshots table may not exist yet, or the insert failed — the
+      // visitor's report above is unaffected either way.
+    }
+
     return {
       ok: true as const,
       url: primary.url,
       pageSpeed: primary.pageSpeed,
       checks: primary.checks,
+      grade,
+      reviews: primaryReviews,
       competitorSource,
       competitors: competitors.map((c, i) => ({
         label: `Competitor ${i + 1}`,
@@ -387,6 +522,7 @@ export const runSnapshot = createServerFn({ method: 'POST' })
         ok: c.ok,
         pageSpeed: c.ok ? c.pageSpeed : null,
         checks: c.ok ? c.checks : [],
+        reviews: competitorPayload[i].reviews,
       })),
     }
   })
