@@ -246,6 +246,7 @@ function FlowStudio() {
             <a href="#how">How it works</a>
             <a href="#faq">FAQ</a>
             <a href="#work">Work</a>
+            <a href="/snapshot">Free Site Check</a>
             <a className="nav-login" href="https://portal.flowstudiogrfx.com/login">Client login</a>
             <a className="nav-cta" href="#intake">Start a project <ArrowRight size={14} /></a>
           </nav>
@@ -260,6 +261,7 @@ function FlowStudio() {
           <a href="#how" onClick={closeMenu}>How it works</a>
           <a href="#faq" onClick={closeMenu}>FAQ</a>
           <a href="#work" onClick={closeMenu}>Work</a>
+          <a href="/snapshot" onClick={closeMenu}>Free Site Check</a>
           <a href="https://portal.flowstudiogrfx.com/login" onClick={closeMenu}>Client login</a>
           <a href="#intake" onClick={closeMenu}>Start a project <ArrowRight size={16} /></a>
         </nav>

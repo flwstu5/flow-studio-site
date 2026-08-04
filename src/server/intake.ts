@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
+import { sendEmail } from './email'
 
 const IntakeSchema = z.object({
   name: z.string().min(1),
@@ -17,35 +18,6 @@ function getAdminClient() {
     process.env.SUPABASE_SECRET_KEY as string,
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
-}
-
-async function sendEmail(params: { to: string; replyTo?: string; subject: string; html: string }) {
-  const apiKey = process.env.MAILGUN_API_KEY
-  const domain = process.env.MAILGUN_DOMAIN || 'flowstudiogrfx.com'
-  if (!apiKey) {
-    throw new Error('Email service is not configured.')
-  }
-
-  const form = new URLSearchParams()
-  form.set('from', 'Flow Studio <admin@flowstudiogrfx.com>')
-  form.set('to', params.to)
-  form.set('subject', params.subject)
-  form.set('html', params.html)
-  if (params.replyTo) form.set('h:Reply-To', params.replyTo)
-
-  const res = await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(`api:${apiKey}`)}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: form.toString(),
-  })
-
-  if (!res.ok) {
-    const errText = await res.text()
-    throw new Error(`Failed to send email: ${errText}`)
-  }
 }
 
 export const submitIntake = createServerFn({ method: 'POST' })

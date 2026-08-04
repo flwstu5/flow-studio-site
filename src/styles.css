@@ -208,6 +208,61 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 
 .ask-first { display: block; margin-top: 12px; text-align: center; font-size: 12px; text-decoration: underline; color: var(--ink-soft); }
 .ask-first:hover { color: var(--ink); }
+
+.snapshot-hero { background: var(--paper); min-height: calc(100vh - 76px); }
+.snapshot-hero .section-heading { max-width: 620px; }
+.snapshot-form { display: grid; gap: 14px; max-width: 480px; margin-top: 10px; }
+.snapshot-form input {
+  padding: 14px 16px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper-bright);
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--ink);
+}
+.snapshot-form input::placeholder { color: var(--ink-soft); }
+.snapshot-form .button { margin-top: 4px; align-self: flex-start; }
+.snapshot-fineprint { margin: 0; color: var(--ink-soft); font-size: 11px; }
+.snapshot-error { margin: 0; color: var(--red-dark); font-size: 13px; font-weight: 600; }
+
+.snapshot-results { max-width: 640px; margin-top: 10px; }
+.snapshot-scores { display: flex; gap: 14px; margin-bottom: 34px; flex-wrap: wrap; }
+.score-card { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 110px; padding: 18px 16px; border: 1.5px solid var(--ink); background: var(--paper-bright); }
+.score-card .score-value { font-family: var(--display); font-size: 34px; line-height: 1; }
+.score-card .score-label { font-size: 9px; color: var(--ink-soft); }
+.score-card.good .score-value { color: #2f7d4f; }
+.score-card.ok .score-value { color: var(--red-mid); }
+.score-card.poor .score-value { color: var(--red-dark); }
+
+.snapshot-group { margin-bottom: 30px; }
+.snapshot-group h3 { margin: 0 0 14px; font-size: 15px; font-weight: 700; }
+.snapshot-checklist { display: grid; gap: 10px; }
+.snapshot-check { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); background: var(--paper-bright); }
+.snapshot-check svg { flex: 0 0 auto; margin-top: 2px; }
+.snapshot-check.fail svg { color: var(--red-dark); }
+.snapshot-check.warn svg { color: var(--red-mid); }
+.snapshot-check.pass svg { color: #2f7d4f; }
+.snapshot-check-label { margin: 0 0 3px; font-size: 13px; font-weight: 700; }
+.snapshot-check-detail { margin: 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
+
+.snapshot-cta { padding: 26px 24px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper-bright); text-align: center; box-shadow: 6px 6px 0 var(--red-mid); }
+.snapshot-cta p { margin: 0 0 16px; font-size: 14px; color: var(--paper-bright); }
+.snapshot-cta .button { margin: 0 auto; }
+
+.snapshot-toggle { align-self: flex-start; border: 0; background: none; padding: 0; font-size: 12px; font-weight: 700; text-decoration: underline; color: var(--red-dark); cursor: pointer; }
+.snapshot-toggle:hover { color: var(--ink); }
+.snapshot-competitor-fields { display: grid; gap: 10px; padding: 14px; border: 1px dashed var(--line); background: rgba(24,23,22,.03); }
+
+.comparison-table-wrap { overflow-x: auto; border: 1.5px solid var(--ink); }
+.comparison-table { width: 100%; border-collapse: collapse; background: var(--paper-bright); font-size: 12.5px; }
+.comparison-table th, .comparison-table td { padding: 10px 14px; text-align: center; border-bottom: 1px dashed var(--line); white-space: nowrap; }
+.comparison-table th:first-child, .comparison-table td:first-child { text-align: left; white-space: normal; }
+.comparison-table thead th { font-family: var(--mono); text-transform: uppercase; font-size: 10px; letter-spacing: .04em; color: var(--ink-soft); border-bottom: 1.5px solid var(--ink); }
+.comparison-table tbody tr:last-child td { border-bottom: 0; }
+.status-pass { color: #2f7d4f; }
+.status-warn { color: var(--red-mid); }
+.status-fail { color: var(--red-dark); }
+.status-unknown { color: var(--ink-soft); }
 .website-grid .plan:not(.featured) .ask-first { color: #d8d3ca; }
 .website-grid .plan:not(.featured) .ask-first:hover { color: #fff; }
 
