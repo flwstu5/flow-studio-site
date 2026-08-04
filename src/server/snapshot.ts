@@ -257,7 +257,10 @@ type PlaceInfo = {
 // review count bumps this into the Enterprise+Atmosphere field tier.
 async function searchNearbyBusinesses(context: BusinessContext): Promise<PlaceInfo[]> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
-  if (!apiKey) return []
+  if (!apiKey) {
+    console.error('Places search skipped: GOOGLE_PLACES_API_KEY is not set in this environment.')
+    return []
+  }
 
   try {
     const controller = new AbortController()
@@ -277,10 +280,20 @@ async function searchNearbyBusinesses(context: BusinessContext): Promise<PlaceIn
       }),
     })
     clearTimeout(timeout)
-    if (!res.ok) return []
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '')
+      console.error(`Places API request failed (${res.status}) for query "${context.category} in ${context.locality}":`, errText)
+      return []
+    }
 
     const data = await res.json()
     const places = Array.isArray(data?.places) ? data.places : []
+    const withWebsite = places.filter((p: any) => typeof p?.websiteUri === 'string').length
+    if (places.length === 0) {
+      console.error(`Places API returned zero results for query "${context.category} in ${context.locality}". Raw response:`, JSON.stringify(data).slice(0, 500))
+    } else {
+      console.error(`Places API returned ${places.length} result(s) for "${context.category} in ${context.locality}", ${withWebsite} with a websiteUri set:`, places.map((p: any) => p?.displayName?.text ?? '?').join(', '))
+    }
 
     return places.map((p: any): PlaceInfo => ({
       websiteUri: typeof p?.websiteUri === 'string' ? p.websiteUri : null,
@@ -289,7 +302,8 @@ async function searchNearbyBusinesses(context: BusinessContext): Promise<PlaceIn
       userRatingCount: typeof p?.userRatingCount === 'number' ? p.userRatingCount : null,
       businessStatus: typeof p?.businessStatus === 'string' ? p.businessStatus : null,
     }))
-  } catch {
+  } catch (err) {
+    console.error('Places request threw:', err instanceof Error ? err.message : err)
     return []
   }
 }
