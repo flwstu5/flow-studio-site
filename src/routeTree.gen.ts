@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SnapshotRouteImport } from './routes/snapshot'
+import { Route as ApiCronNurtureRouteImport } from './routes/api/cron/nurture'
+import { Route as ApiCronRecurringScanRouteImport } from './routes/api/cron/recurring-scan'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const SnapshotRoute = SnapshotRouteImport.update({
   path: '/snapshot',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronNurtureRoute = ApiCronNurtureRouteImport.update({
+  id: '/api/cron/nurture',
+  path: '/api/cron/nurture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronRecurringScanRoute = ApiCronRecurringScanRouteImport.update({
+  id: '/api/cron/recurring-scan',
+  path: '/api/cron/recurring-scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/snapshot': typeof SnapshotRoute
+  '/api/cron/nurture': typeof ApiCronNurtureRoute
+  '/api/cron/recurring-scan': typeof ApiCronRecurringScanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/snapshot': typeof SnapshotRoute
+  '/api/cron/nurture': typeof ApiCronNurtureRoute
+  '/api/cron/recurring-scan': typeof ApiCronRecurringScanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/snapshot': typeof SnapshotRoute
+  '/api/cron/nurture': typeof ApiCronNurtureRoute
+  '/api/cron/recurring-scan': typeof ApiCronRecurringScanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/snapshot'
+  fullPaths: '/' | '/snapshot' | '/api/cron/nurture' | '/api/cron/recurring-scan'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/snapshot'
-  id: '__root__' | '/' | '/snapshot'
+  to: '/' | '/snapshot' | '/api/cron/nurture' | '/api/cron/recurring-scan'
+  id: '__root__' | '/' | '/snapshot' | '/api/cron/nurture' | '/api/cron/recurring-scan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SnapshotRoute: typeof SnapshotRoute
+  ApiCronNurtureRoute: typeof ApiCronNurtureRoute
+  ApiCronRecurringScanRoute: typeof ApiCronRecurringScanRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SnapshotRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/nurture': {
+      id: '/api/cron/nurture'
+      path: '/api/cron/nurture'
+      fullPath: '/api/cron/nurture'
+      preLoaderRoute: typeof ApiCronNurtureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/recurring-scan': {
+      id: '/api/cron/recurring-scan'
+      path: '/api/cron/recurring-scan'
+      fullPath: '/api/cron/recurring-scan'
+      preLoaderRoute: typeof ApiCronRecurringScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SnapshotRoute: SnapshotRoute,
+  ApiCronNurtureRoute: ApiCronNurtureRoute,
+  ApiCronRecurringScanRoute: ApiCronRecurringScanRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

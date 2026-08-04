@@ -212,6 +212,25 @@ function FlowStudio() {
     }
   }
 
+  // Supports deep-linking from the snapshot tool with a prefilled brief:
+  // /?serviceType=...&message=...&business=...&email=...#intake
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const serviceType = params.get('serviceType')
+    const message = params.get('message')
+    const business = params.get('business')
+    const email = params.get('email')
+    if (!serviceType && !message && !business && !email) return
+    setIntakeForm((prev) => ({
+      ...prev,
+      serviceType: serviceType ?? prev.serviceType,
+      message: message ?? prev.message,
+      business: business ?? prev.business,
+      email: email ?? prev.email,
+    }))
+    document.getElementById('intake')?.scrollIntoView({ block: 'start' })
+  }, [])
+
   useEffect(() => {
     const reveal = new IntersectionObserver(
       (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')),

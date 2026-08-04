@@ -33,6 +33,32 @@ type SnapshotResult =
     }
   | { ok: false; error: string }
 
+// Mirrors src/server/snapshot.ts SERVICE_MAP — kept in sync manually since
+// this needs to run client-side and the two files aren't otherwise shared.
+const SERVICE_MAP: Record<string, { service: string; fix: string }> = {
+  title: { service: 'Website design & dev', fix: 'Rewrite page titles for search and click-through.' },
+  description: { service: 'Website design & dev', fix: 'Add compelling meta descriptions across key pages.' },
+  h1: { service: 'Website design & dev', fix: 'Clean up heading structure so each page has one clear H1.' },
+  alt: { service: 'Website design & dev', fix: 'Add descriptive alt text to images for accessibility and SEO.' },
+  viewport: { service: 'Website design & dev', fix: 'Fix mobile responsiveness so the site works properly on phones.' },
+  https: { service: 'Website design & dev', fix: 'Move the site to HTTPS for security and trust.' },
+  social: { service: 'Website design & dev', fix: 'Add Open Graph tags so links preview properly when shared.' },
+  schema: { service: 'Website design & dev', fix: 'Add structured data (schema.org) for richer search results.' },
+  favicon: { service: 'Website design & dev', fix: 'Add a favicon for a more polished, trustworthy look.' },
+  'social-links': { service: 'Website design & dev', fix: 'Link up social profiles across the site.' },
+  robots: { service: 'Website design & dev', fix: 'Add a robots.txt with proper crawl instructions.' },
+  sitemap: { service: 'Website design & dev', fix: 'Add a sitemap.xml so search engines can find every page.' },
+  gbp: { service: 'Something else', fix: 'Claim and optimize the Google Business Profile so local searchers can find and trust the business.' },
+}
+
+function buildIntakeLink(opportunities: CheckResult[], business: string) {
+  const top = opportunities.slice(0, 5)
+  const lines = top.map((c) => `- ${c.label}: ${SERVICE_MAP[c.id]?.fix ?? c.detail}`).join('\n')
+  const message = `From the free site check${business ? ` for ${business}` : ''}, we'd like help with:\n${lines}`
+  const params = new URLSearchParams({ serviceType: 'Website design & dev', message })
+  return `/?${params.toString()}#intake`
+}
+
 function SnapshotPage() {
   const [form, setForm] = useState({ url: '', email: '', business: '', competitor1: '', competitor2: '' })
   const [showCompetitors, setShowCompetitors] = useState(false)
@@ -198,6 +224,9 @@ function SnapshotPage() {
                         <div>
                           <p className="snapshot-check-label">{c.label}</p>
                           <p className="snapshot-check-detail">{c.detail}</p>
+                          {SERVICE_MAP[c.id] && (
+                            <p className="snapshot-check-fix">We fix this as part of {SERVICE_MAP[c.id].service}.</p>
+                          )}
                         </div>
                       </li>
                     ))}
@@ -240,9 +269,15 @@ function SnapshotPage() {
                 </div>
               )}
 
-              <div className="snapshot-cta no-print">
-                <p>We just emailed a copy of this to our team — if you'd like help fixing any of this, let's talk.</p>
-                <a href="/#intake" className="button button-solid">Start a project <ArrowRight size={16} /></a>
+              <div className="snapshot-cta">
+                <p className="no-print">We just emailed a copy of this to our team — if you'd like help fixing any of this, let's talk.</p>
+                <p className="snapshot-cta-print-only">Ready to fix this? Let's talk — flowstudiogrfx.com</p>
+                <a
+                  href={opportunities.length > 0 ? buildIntakeLink(opportunities, form.business) : '/#intake'}
+                  className="button button-solid"
+                >
+                  Start a project <ArrowRight size={16} />
+                </a>
               </div>
             </div>
           )}

@@ -11,16 +11,16 @@ const SnapshotSchema = z.object({
   competitor2: z.string().optional(),
 })
 
-type CheckStatus = 'pass' | 'warn' | 'fail'
+export type CheckStatus = 'pass' | 'warn' | 'fail'
 
-type CheckResult = {
+export type CheckResult = {
   id: string
   label: string
   status: CheckStatus
   detail: string
 }
 
-type PageSpeedScores = {
+export type PageSpeedScores = {
   performance: number
   seo: number
   accessibility: number
@@ -166,11 +166,11 @@ function runOnPageChecks(html: string, finalUrl: string): CheckResult[] {
   return checks
 }
 
-type SiteScan =
+export type SiteScan =
   | { ok: true; url: string; html: string; checks: CheckResult[]; pageSpeed: PageSpeedScores | null }
   | { ok: false; url: string }
 
-async function scanSite(rawUrl: string): Promise<SiteScan> {
+export async function scanSite(rawUrl: string): Promise<SiteScan> {
   const targetUrl = normalizeUrl(rawUrl)
 
   const [pageResult, robotsOk, sitemapOk, pageSpeed] = await Promise.all([
@@ -316,7 +316,10 @@ function findPlaceForUrl(places: PlaceInfo[], url: string): PlaceInfo | null {
 
 async function runPageSpeed(url: string): Promise<PageSpeedScores | null> {
   const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY
-  if (!apiKey) return null
+  if (!apiKey) {
+    console.error('PageSpeed skipped: GOOGLE_PAGESPEED_API_KEY is not set in this environment.')
+    return null
+  }
 
   try {
     const endpoint = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed')
@@ -330,17 +333,25 @@ async function runPageSpeed(url: string): Promise<PageSpeedScores | null> {
     const res = await fetch(endpoint.toString(), { signal: controller.signal })
     clearTimeout(timeout)
 
-    if (!res.ok) return null
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '')
+      console.error(`PageSpeed API request failed (${res.status}):`, errText)
+      return null
+    }
     const data = await res.json()
     const categories = data?.lighthouseResult?.categories
-    if (!categories) return null
+    if (!categories) {
+      console.error('PageSpeed API response missing lighthouseResult.categories:', JSON.stringify(data).slice(0, 500))
+      return null
+    }
 
     return {
       performance: Math.round((categories.performance?.score ?? 0) * 100),
       seo: Math.round((categories.seo?.score ?? 0) * 100),
       accessibility: Math.round((categories.accessibility?.score ?? 0) * 100),
     }
-  } catch {
+  } catch (err) {
+    console.error('PageSpeed request threw:', err instanceof Error ? err.message : err)
     return null
   }
 }
@@ -349,9 +360,51 @@ function emailChecklist(checks: CheckResult[]) {
   return checks.map((c) => `<li><strong>${c.status.toUpperCase()}</strong> — ${c.label}: ${c.detail}</li>`).join('')
 }
 
-type Grade = { percent: number; letter: string }
+// Maps each check to the real Flow Studio service that fixes it, plus a
+// one-line pitch. Used to turn a diagnostic report into a sales prompt —
+// both in the lead email (for staff on a call) and on the results page
+// (for the visitor themselves). Kept to services that actually exist on
+// the pricing page so this never overpromises.
+export const SERVICE_MAP: Record<string, { service: string; fix: string }> = {
+  title: { service: 'Website design & dev', fix: 'Rewrite page titles for search and click-through.' },
+  description: { service: 'Website design & dev', fix: 'Add compelling meta descriptions across key pages.' },
+  h1: { service: 'Website design & dev', fix: 'Clean up heading structure so each page has one clear H1.' },
+  alt: { service: 'Website design & dev', fix: 'Add descriptive alt text to images for accessibility and SEO.' },
+  viewport: { service: 'Website design & dev', fix: 'Fix mobile responsiveness so the site works properly on phones.' },
+  https: { service: 'Website design & dev', fix: 'Move the site to HTTPS for security and trust.' },
+  social: { service: 'Website design & dev', fix: 'Add Open Graph tags so links preview properly when shared.' },
+  schema: { service: 'Website design & dev', fix: 'Add structured data (schema.org) for richer search results.' },
+  favicon: { service: 'Website design & dev', fix: 'Add a favicon for a more polished, trustworthy look.' },
+  'social-links': { service: 'Website design & dev', fix: 'Link up social profiles across the site.' },
+  robots: { service: 'Website design & dev', fix: 'Add a robots.txt with proper crawl instructions.' },
+  sitemap: { service: 'Website design & dev', fix: 'Add a sitemap.xml so search engines can find every page.' },
+  gbp: { service: 'Something else', fix: 'Claim and optimize the Google Business Profile so local searchers can find and trust the business.' },
+}
 
-function computeGrade(checks: CheckResult[], pageSpeed: PageSpeedScores | null): Grade {
+function buildPitchSummary(checks: CheckResult[]) {
+  const opportunities = checks.filter((c) => c.status !== 'pass')
+  if (opportunities.length === 0) return ''
+
+  const byService = new Map<string, string[]>()
+  for (const c of opportunities) {
+    const mapping = SERVICE_MAP[c.id]
+    if (!mapping) continue
+    const list = byService.get(mapping.service) ?? []
+    list.push(c.label)
+    byService.set(mapping.service, list)
+  }
+  if (byService.size === 0) return ''
+
+  const rows = [...byService.entries()]
+    .map(([service, labels]) => `<li><strong>${service}</strong> — fixes ${labels.length}: ${labels.join(', ')}</li>`)
+    .join('')
+
+  return `<hr /><h3>Suggested pitch</h3><ul>${rows}</ul>`
+}
+
+export type Grade = { percent: number; letter: string }
+
+export function computeGrade(checks: CheckResult[], pageSpeed: PageSpeedScores | null): Grade {
   const points = checks.reduce((sum, c) => sum + (c.status === 'pass' ? 2 : c.status === 'warn' ? 1 : 0), 0)
   const maxPoints = checks.length * 2
   let ratio = maxPoints > 0 ? points / maxPoints : 0
@@ -460,6 +513,7 @@ export const runSnapshot = createServerFn({ method: 'POST' })
           ${primary.pageSpeed ? `<p><strong>PageSpeed scores (mobile):</strong> Performance ${primary.pageSpeed.performance}, SEO ${primary.pageSpeed.seo}, Accessibility ${primary.pageSpeed.accessibility}</p>` : '<p><em>PageSpeed scoring not configured — showing on-page checks only.</em></p>'}
           <p><strong>Overall grade:</strong> ${grade.letter} (${grade.percent}%)</p>
           <ul>${emailChecklist(primary.checks)}</ul>
+          ${buildPitchSummary(primary.checks)}
           ${competitorHtml ? `<hr /><h3>Competitors they're up against (${competitorSource === 'auto' ? 'auto-discovered nearby' : 'submitted manually'})</h3>${competitorHtml}` : ''}
         `,
       })
@@ -505,6 +559,28 @@ export const runSnapshot = createServerFn({ method: 'POST' })
       }
     } catch {
       // snapshots table may not exist yet, or the insert failed — the
+      // visitor's report above is unaffected either way.
+    }
+
+    // Save every public lead — client or not — so the nurture-email cron
+    // has something to follow up on. Separate table and separate try/catch
+    // from the client-snapshots save above so neither one can block the
+    // other or the visitor's response.
+    try {
+      const admin = getAdminClient()
+      await admin.from('snapshot_leads').insert({
+        email: data.email,
+        business: data.business ?? null,
+        url: primary.url,
+        grade_letter: grade.letter,
+        grade_percent: grade.percent,
+        opportunity_count: opportunityCount,
+        checks: primary.checks,
+        page_speed: primary.pageSpeed,
+        reviews: primaryReviews,
+      })
+    } catch {
+      // snapshot_leads table may not exist yet, or the insert failed — the
       // visitor's report above is unaffected either way.
     }
 
