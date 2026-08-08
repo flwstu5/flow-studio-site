@@ -505,7 +505,7 @@ export const runSnapshot = createServerFn({ method: 'POST' })
     try {
       const competitorHtml = competitors
         .map((c, i) => {
-          const label = `Competitor ${i + 1}`
+          const label = competitorReviews[i]?.displayName || safeHostname(c.url) || `Competitor ${i + 1}`
           if (!c.ok) return `<p><strong>${label} (${c.url}):</strong> couldn't be reached.</p>`
           return `
             <p><strong>${label}: ${c.url}</strong></p>
@@ -607,7 +607,7 @@ export const runSnapshot = createServerFn({ method: 'POST' })
       reviews: primaryReviews,
       competitorSource,
       competitors: competitors.map((c, i) => ({
-        label: `Competitor ${i + 1}`,
+        label: competitorReviews[i]?.displayName || safeHostname(c.url) || `Competitor ${i + 1}`,
         url: c.url,
         ok: c.ok,
         pageSpeed: c.ok ? c.pageSpeed : null,
