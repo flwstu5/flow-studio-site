@@ -35,6 +35,25 @@ export const Route = createRootRoute({
       { rel: 'icon', href: '/favicon-192.png', type: 'image/png', sizes: '192x192' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png', sizes: '180x180' },
     ],
+    scripts: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'ProfessionalService',
+          name: 'Flow Studio',
+          url: 'https://www.flowstudiogrfx.com',
+          logo: 'https://www.flowstudiogrfx.com/logo-full1.png',
+          image: 'https://www.flowstudiogrfx.com/og-image.png',
+          description: 'Independent graphic design studio for brand identity, websites, print, and recurring flyer design.',
+          email: 'admin@flowstudiogrfx.com',
+          sameAs: [
+            'https://www.instagram.com/flowstudiogrfx',
+            'https://www.facebook.com/share/1JNNpkLKfL/?mibextid=wwXIfr',
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootDocument,
 })

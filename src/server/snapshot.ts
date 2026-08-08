@@ -143,16 +143,28 @@ function runOnPageChecks(html: string, finalUrl: string): CheckResult[] {
     detail: hasFavicon ? 'Favicon tag found.' : 'No favicon link found in the page head.',
   })
 
-  const socialPlatforms: { name: string; pattern: RegExp }[] = [
-    { name: 'Facebook', pattern: /facebook\.com\// },
-    { name: 'Instagram', pattern: /instagram\.com\// },
-    { name: 'LinkedIn', pattern: /linkedin\.com\// },
-    { name: 'X/Twitter', pattern: /(?:twitter\.com|x\.com)\// },
-    { name: 'TikTok', pattern: /tiktok\.com\// },
-    { name: 'YouTube', pattern: /youtube\.com\// },
+  // Matched by exact hostname, not a loose substring regex — a substring
+  // match like /x\.com\// would false-positive on any domain that happens
+  // to end in "x.com" (e.g. flowstudiogrfx.com/... itself).
+  const socialPlatforms: { name: string; hostnames: string[] }[] = [
+    { name: 'Facebook', hostnames: ['facebook.com', 'fb.com'] },
+    { name: 'Instagram', hostnames: ['instagram.com'] },
+    { name: 'LinkedIn', hostnames: ['linkedin.com'] },
+    { name: 'X/Twitter', hostnames: ['twitter.com', 'x.com'] },
+    { name: 'TikTok', hostnames: ['tiktok.com'] },
+    { name: 'YouTube', hostnames: ['youtube.com', 'youtu.be'] },
   ]
   const hrefs = [...html.matchAll(/href=["']([^"']+)["']/gi)].map((m) => m[1])
-  const foundPlatforms = socialPlatforms.filter((p) => hrefs.some((h) => p.pattern.test(h)))
+  const hrefHostnames = hrefs
+    .map((h) => {
+      try {
+        return new URL(h, finalUrl).hostname.replace(/^www\./, '').toLowerCase()
+      } catch {
+        return null
+      }
+    })
+    .filter((h): h is string => h !== null)
+  const foundPlatforms = socialPlatforms.filter((p) => p.hostnames.some((domain) => hrefHostnames.includes(domain)))
   checks.push({
     id: 'social-links',
     label: 'Social profiles linked',
