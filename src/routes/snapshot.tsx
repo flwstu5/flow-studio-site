@@ -113,7 +113,7 @@ function SnapshotPage() {
       <header className="site-header no-print">
         <div className="wrap nav-inner">
           <a className="logo" href="/" aria-label="Flow Studio home">
-            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
+            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" width="350" height="303" />
           </a>
           <nav className="desktop-nav" aria-label="Primary navigation">
             <a href="/#services">Services</a>
@@ -136,6 +136,7 @@ function SnapshotPage() {
             <form onSubmit={handleSubmit} className="snapshot-form">
               <input
                 required
+                aria-label="Website URL"
                 placeholder="yourbusiness.com"
                 value={form.url}
                 onChange={(e) => updateField('url', e.target.value)}
@@ -143,11 +144,13 @@ function SnapshotPage() {
               <input
                 required
                 type="email"
+                aria-label="Email address"
                 placeholder="Email address"
                 value={form.email}
                 onChange={(e) => updateField('email', e.target.value)}
               />
               <input
+                aria-label="Business name"
                 placeholder="Business name (optional)"
                 value={form.business}
                 onChange={(e) => updateField('business', e.target.value)}
@@ -164,11 +167,13 @@ function SnapshotPage() {
               ) : (
                 <div className="snapshot-competitor-fields">
                   <input
+                    aria-label="Competitor website"
                     placeholder="Competitor website (optional)"
                     value={form.competitor1}
                     onChange={(e) => updateField('competitor1', e.target.value)}
                   />
                   <input
+                    aria-label="Another competitor website"
                     placeholder="Another competitor (optional)"
                     value={form.competitor2}
                     onChange={(e) => updateField('competitor2', e.target.value)}
@@ -287,7 +292,7 @@ function SnapshotPage() {
       <footer className="no-print">
         <div className="wrap footer-inner">
           <a className="logo footer-logo" href="/">
-            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
+            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" width="350" height="303" />
           </a>
           <span className="mono">Independent design studio / © 2026</span>
           <div className="footer-contact">

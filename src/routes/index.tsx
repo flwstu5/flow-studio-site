@@ -256,7 +256,7 @@ function FlowStudio() {
       <header className="site-header">
         <div className="wrap nav-inner">
           <a className="logo" href="#top" aria-label="Flow Studio home" onClick={closeMenu}>
-            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
+            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" width="350" height="303" />
           </a>
           <nav className="desktop-nav" aria-label="Primary navigation">
             <a href="#services">Services</a>
@@ -439,15 +439,16 @@ function FlowStudio() {
               <p style={{ fontWeight: 600 }}>Got it — thanks! We'll review your project and follow up shortly.</p>
             ) : (
               <form onSubmit={handleCustomSubmit} style={{ display: 'grid', gap: 14, maxWidth: 560 }}>
-                <input required placeholder="Your name" value={customForm.name} onChange={(e) => updateCustomField('name', e.target.value)} />
-                <input required type="email" placeholder="Email address" value={customForm.email} onChange={(e) => updateCustomField('email', e.target.value)} />
-                <input required placeholder="Business / brand name" value={customForm.business} onChange={(e) => updateCustomField('business', e.target.value)} />
-                <input placeholder="Current website (if any)" value={customForm.currentSite} onChange={(e) => updateCustomField('currentSite', e.target.value)} />
-                <input required placeholder="Ideal timeline (e.g. 6 weeks, flexible)" value={customForm.timeline} onChange={(e) => updateCustomField('timeline', e.target.value)} />
-                <input required placeholder="Budget range" value={customForm.budget} onChange={(e) => updateCustomField('budget', e.target.value)} />
+                <input required aria-label="Your name" placeholder="Your name" value={customForm.name} onChange={(e) => updateCustomField('name', e.target.value)} />
+                <input required type="email" aria-label="Email address" placeholder="Email address" value={customForm.email} onChange={(e) => updateCustomField('email', e.target.value)} />
+                <input required aria-label="Business / brand name" placeholder="Business / brand name" value={customForm.business} onChange={(e) => updateCustomField('business', e.target.value)} />
+                <input aria-label="Current website (if any)" placeholder="Current website (if any)" value={customForm.currentSite} onChange={(e) => updateCustomField('currentSite', e.target.value)} />
+                <input required aria-label="Ideal timeline" placeholder="Ideal timeline (e.g. 6 weeks, flexible)" value={customForm.timeline} onChange={(e) => updateCustomField('timeline', e.target.value)} />
+                <input required aria-label="Budget range" placeholder="Budget range" value={customForm.budget} onChange={(e) => updateCustomField('budget', e.target.value)} />
                 <textarea
                   required
                   rows={5}
+                  aria-label="Project goals"
                   placeholder="What are you building, and why does it need a full custom build? (integrations, animations, complex features, etc.)"
                   value={customForm.goals}
                   onChange={(e) => updateCustomField('goals', e.target.value)}
@@ -515,7 +516,7 @@ function FlowStudio() {
               onClick={() => setLightbox({ src: '/work-logo-hall-of-fame.png', alt: 'Hall of Fame Pet Care logo mark' })}
             >
               <div className="poster-brand poster-image">
-                <img src="/work-logo-hall-of-fame.png" alt="Hall of Fame Pet Care logo mark" />
+                <img src="/work-logo-hall-of-fame.png" alt="Hall of Fame Pet Care logo mark" width="900" height="326" loading="lazy" decoding="async" />
               </div>
               <div className="work-caption"><span>Hall of Fame Pet Care</span><small className="mono">Logo &amp; brand design</small></div>
             </button>
@@ -523,7 +524,7 @@ function FlowStudio() {
               <div className="browser">
                 <div className="browser-bar"><i /><i /><i /></div>
                 <div className="browser-body browser-image">
-                  <img src="/work-web-out-the-mud.jpg" alt="Out The Mud Hauling homepage hero" />
+                  <img src="/work-web-out-the-mud.jpg" alt="Out The Mud Hauling homepage hero" width="1000" height="429" loading="lazy" decoding="async" />
                 </div>
               </div>
               <div className="work-caption"><span>Out The Mud Hauling</span><small className="mono">Web design</small></div>
@@ -534,7 +535,7 @@ function FlowStudio() {
               onClick={() => setLightbox({ src: '/work-flyer-designer-dinners.jpg', alt: 'Designer Dinners by Jaq flyer' })}
             >
               <div className="flyer-stack flyer-image">
-                <img src="/work-flyer-designer-dinners.jpg" alt="Designer Dinners by Jaq flyer" />
+                <img src="/work-flyer-designer-dinners.jpg" alt="Designer Dinners by Jaq flyer" width="900" height="900" loading="lazy" decoding="async" />
               </div>
               <div className="work-caption"><span>Designer Dinners by Jaq</span><small className="mono">Flyer design</small></div>
             </button>
@@ -561,6 +562,7 @@ function FlowStudio() {
               >
                 <input
                   required
+                  aria-label="Your name"
                   placeholder="Your name"
                   value={intakeForm.name}
                   onChange={(e) => updateIntakeField('name', e.target.value)}
@@ -568,17 +570,20 @@ function FlowStudio() {
                 <input
                   required
                   type="email"
+                  aria-label="Email address"
                   placeholder="Email address"
                   value={intakeForm.email}
                   onChange={(e) => updateIntakeField('email', e.target.value)}
                 />
                 <input
                   required
+                  aria-label="Business / brand name"
                   placeholder="Business / brand name"
                   value={intakeForm.business}
                   onChange={(e) => updateIntakeField('business', e.target.value)}
                 />
                 <select
+                  aria-label="Service type"
                   value={intakeForm.serviceType}
                   onChange={(e) => updateIntakeField('serviceType', e.target.value)}
                 >
@@ -590,6 +595,7 @@ function FlowStudio() {
                 </select>
                 <input
                   required
+                  aria-label="Budget range"
                   placeholder="Budget range (e.g. $500–1000)"
                   value={intakeForm.budget}
                   onChange={(e) => updateIntakeField('budget', e.target.value)}
@@ -597,6 +603,7 @@ function FlowStudio() {
                 <textarea
                   required
                   rows={4}
+                  aria-label="Project details"
                   placeholder="Tell us about the project"
                   value={intakeForm.message}
                   onChange={(e) => updateIntakeField('message', e.target.value)}
@@ -622,7 +629,7 @@ function FlowStudio() {
       <footer>
         <div className="wrap footer-inner">
           <a className="logo footer-logo" href="#top">
-            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" />
+            <img src="/logo-full1.png" alt="Flow Studio" className="logo-image" width="350" height="303" loading="lazy" decoding="async" />
           </a>
           <span className="mono">Independent design studio / © 2026</span>
           <div className="footer-social">

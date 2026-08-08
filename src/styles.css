@@ -191,7 +191,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .step { min-height: 240px; padding: 25px 25px 20px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); border-right: 1px solid var(--line); }
 .step:first-child { border-left: 1.5px solid var(--ink); }.step:last-child { border-right: 1.5px solid var(--ink); }
 .step-top { display: flex; align-items: center; gap: 13px; margin-bottom: 74px; }
-.step-top span { color: var(--red-mid); font-size: 10px; font-weight: 600; }
+.step-top span { color: var(--red-dark); font-size: 10px; font-weight: 600; }
 .step-top i { height: 1px; flex: 1; background: var(--line); position: relative; }
 .step-top i::after { content: ''; position: absolute; right: -1px; top: -3px; width: 7px; height: 7px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); transform: rotate(45deg); }
 .step h3 { margin: 0 0 9px; font-size: 17px; }
