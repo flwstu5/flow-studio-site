@@ -11,6 +11,31 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.flowstudiogrfx.com/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.flowstudiogrfx.com/blog/5-things-your-website-needs-before-launch</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.flowstudiogrfx.com/blog/how-often-to-refresh-your-flyer-design</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.flowstudiogrfx.com/blog/brand-identity-vs-just-a-logo</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.flowstudiogrfx.com/blog/behind-the-build-bridgeway-collective</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://www.flowstudiogrfx.com/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

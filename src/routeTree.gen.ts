@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SnapshotRouteImport } from './routes/snapshot'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiCronNurtureRouteImport } from './routes/api/cron/nurture'
 import { Route as ApiCronRecurringScanRouteImport } from './routes/api/cron/recurring-scan'
 
@@ -36,6 +38,16 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCronNurtureRoute = ApiCronNurtureRouteImport.update({
   id: '/api/cron/nurture',
   path: '/api/cron/nurture',
@@ -52,6 +64,8 @@ export interface FileRoutesByFullPath {
   '/snapshot': typeof SnapshotRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/blog': typeof BlogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/api/cron/nurture': typeof ApiCronNurtureRoute
   '/api/cron/recurring-scan': typeof ApiCronRecurringScanRoute
 }
@@ -60,6 +74,8 @@ export interface FileRoutesByTo {
   '/snapshot': typeof SnapshotRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/blog': typeof BlogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/api/cron/nurture': typeof ApiCronNurtureRoute
   '/api/cron/recurring-scan': typeof ApiCronRecurringScanRoute
 }
@@ -69,15 +85,17 @@ export interface FileRoutesById {
   '/snapshot': typeof SnapshotRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/blog': typeof BlogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/api/cron/nurture': typeof ApiCronNurtureRoute
   '/api/cron/recurring-scan': typeof ApiCronRecurringScanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/snapshot' | '/privacy' | '/terms' | '/api/cron/nurture' | '/api/cron/recurring-scan'
+  fullPaths: '/' | '/snapshot' | '/privacy' | '/terms' | '/blog' | '/blog/$slug' | '/api/cron/nurture' | '/api/cron/recurring-scan'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/snapshot' | '/privacy' | '/terms' | '/api/cron/nurture' | '/api/cron/recurring-scan'
-  id: '__root__' | '/' | '/snapshot' | '/privacy' | '/terms' | '/api/cron/nurture' | '/api/cron/recurring-scan'
+  to: '/' | '/snapshot' | '/privacy' | '/terms' | '/blog' | '/blog/$slug' | '/api/cron/nurture' | '/api/cron/recurring-scan'
+  id: '__root__' | '/' | '/snapshot' | '/privacy' | '/terms' | '/blog' | '/blog/$slug' | '/api/cron/nurture' | '/api/cron/recurring-scan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -85,6 +103,8 @@ export interface RootRouteChildren {
   SnapshotRoute: typeof SnapshotRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  BlogRoute: typeof BlogRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   ApiCronNurtureRoute: typeof ApiCronNurtureRoute
   ApiCronRecurringScanRoute: typeof ApiCronRecurringScanRoute
 }
@@ -119,6 +139,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/cron/nurture': {
       id: '/api/cron/nurture'
       path: '/api/cron/nurture'
@@ -141,6 +175,8 @@ const rootRouteChildren: RootRouteChildren = {
   SnapshotRoute: SnapshotRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  BlogRoute: BlogRoute,
+  BlogSlugRoute: BlogSlugRoute,
   ApiCronNurtureRoute: ApiCronNurtureRoute,
   ApiCronRecurringScanRoute: ApiCronRecurringScanRoute,
 }

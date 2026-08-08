@@ -144,6 +144,7 @@ function SnapshotPage() {
           </a>
           <nav className="desktop-nav" aria-label="Primary navigation">
             <a href="/#services">Services</a>
+            <a href="/blog">Blog</a>
             <a href="/#faq">FAQ</a>
             <a className="nav-login" href="https://portal.flowstudiogrfx.com/login">Client login</a>
             <a className="nav-cta" href="/#intake">Start a project <ArrowRight size={14} /></a>
