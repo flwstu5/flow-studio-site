@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ArrowRight, Facebook, Instagram, Linkedin } from 'lucide-react'
-import { getPostBySlug, type BlogBlock } from '../blog-posts'
+import { getPostBySlug, type BlogBlock } from '../../blog-posts'
 
 export const Route = createFileRoute('/blog/$slug')({
   component: BlogPostPage,
