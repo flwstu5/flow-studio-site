@@ -50,6 +50,7 @@ export const Route = createRootRoute({
           sameAs: [
             'https://www.instagram.com/flowstudiogrfx',
             'https://www.facebook.com/share/1JNNpkLKfL/?mibextid=wwXIfr',
+            'https://www.linkedin.com/company/flowstudiogrfx',
           ],
         }),
       },

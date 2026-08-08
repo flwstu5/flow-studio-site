@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { ArrowDownRight, ArrowRight, Check, Facebook, Instagram, Menu, X } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, Check, Facebook, Instagram, Linkedin, Menu, X } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 import { submitIntake } from '../server/intake'
 
@@ -638,6 +638,9 @@ function FlowStudio() {
             </a>
             <a href="https://www.facebook.com/share/1JNNpkLKfL/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Flow Studio on Facebook">
               <Facebook size={17} />
+            </a>
+            <a href="https://www.linkedin.com/company/flowstudiogrfx" target="_blank" rel="noopener noreferrer" aria-label="Flow Studio on LinkedIn">
+              <Linkedin size={17} />
             </a>
           </div>
           <div className="footer-contact">
