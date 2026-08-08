@@ -22,6 +22,31 @@ export const Route = createFileRoute('/blog/$slug')({
         { name: 'twitter:title', content: `${post.title} — Flow Studio` },
         { name: 'twitter:description', content: post.excerpt },
       ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: post.title,
+            description: post.excerpt,
+            datePublished: post.date,
+            dateModified: post.date,
+            image: 'https://www.flowstudiogrfx.com/og-image.png',
+            url: `https://www.flowstudiogrfx.com/blog/${post.slug}`,
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': `https://www.flowstudiogrfx.com/blog/${post.slug}`,
+            },
+            author: { '@type': 'Organization', name: 'Flow Studio', url: 'https://www.flowstudiogrfx.com' },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Flow Studio',
+              logo: { '@type': 'ImageObject', url: 'https://www.flowstudiogrfx.com/logo-full1.png' },
+            },
+          }),
+        },
+      ],
     }
   },
 })
