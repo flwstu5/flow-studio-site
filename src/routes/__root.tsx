@@ -37,6 +37,11 @@ export const Route = createRootRoute({
     ],
     scripts: [
       {
+        defer: true,
+        'data-domain': 'flowstudiogrfx.com',
+        src: 'https://plausible.io/js/script.js',
+      },
+      {
         type: 'application/ld+json',
         children: JSON.stringify({
           '@context': 'https://schema.org',

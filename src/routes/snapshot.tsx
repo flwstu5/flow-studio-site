@@ -5,6 +5,33 @@ import { runSnapshot } from '../server/snapshot'
 
 export const Route = createFileRoute('/snapshot')({
   component: SnapshotPage,
+  head: () => ({
+    meta: [
+      { title: 'Free Website Snapshot — Flow Studio' },
+      {
+        name: 'description',
+        content: 'Get a free instant grade for your website: performance, SEO, accessibility, Google Business Profile, and how you stack up against local competitors.',
+      },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: 'https://www.flowstudiogrfx.com/snapshot' },
+      { property: 'og:title', content: 'Free Website Snapshot — Flow Studio' },
+      {
+        property: 'og:description',
+        content: 'Get a free instant grade for your website: performance, SEO, accessibility, Google Business Profile, and how you stack up against local competitors.',
+      },
+      { property: 'og:image', content: 'https://www.flowstudiogrfx.com/og-image.png' },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
+
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'Free Website Snapshot — Flow Studio' },
+      {
+        name: 'twitter:description',
+        content: 'Get a free instant grade for your website: performance, SEO, accessibility, Google Business Profile, and how you stack up against local competitors.',
+      },
+      { name: 'twitter:image', content: 'https://www.flowstudiogrfx.com/og-image.png' },
+    ],
+  }),
 })
 
 type CheckStatus = 'pass' | 'warn' | 'fail'
@@ -298,6 +325,10 @@ function SnapshotPage() {
           <div className="footer-contact">
             <a className="mono footer-email" href="mailto:admin@flowstudiogrfx.com">admin@flowstudiogrfx.com</a>
             <span className="mono footer-response">We reply within 1 business day</span>
+            <div className="footer-legal no-print">
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+            </div>
           </div>
         </div>
       </footer>

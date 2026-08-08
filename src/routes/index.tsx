@@ -646,6 +646,10 @@ function FlowStudio() {
           <div className="footer-contact">
             <a className="mono footer-email" href="mailto:admin@flowstudiogrfx.com">admin@flowstudiogrfx.com</a>
             <span className="mono footer-response">We reply within 1 business day</span>
+            <div className="footer-legal">
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+            </div>
           </div>
         </div>
       </footer>
