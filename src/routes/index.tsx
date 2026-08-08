@@ -543,6 +543,32 @@ function FlowStudio() {
         </div>
       </section>
 
+      <section className="testimonials section" id="testimonials">
+        <div className="wrap reveal">
+          <p className="section-label mono">05 / What clients say</p>
+          <div className="section-heading">
+            <h2 className="display">Don't take<br />our word for it.</h2>
+            <p>Real feedback from people we've built for.</p>
+          </div>
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "It's one thing to hire somebody who can do the work. It's another thing to work with somebody who
+              genuinely puts their ALL into what they do — someone who cares about the outcome, listens to your
+              vision, and treats what you're building like it actually matters. You didn't just build me a website.
+              You helped me create a digital home for a vision that means so much to me."
+            </p>
+            <div className="testimonial-attribution">
+              <span className="testimonial-name">Aaliyah Garcia</span>
+              <span className="mono testimonial-role">Founder, Bridgeway Collective</span>
+            </div>
+            <p className="mono testimonial-result">
+              Website design &amp; launch — live in time for their Small Business Growth &amp; Networking Experience,
+              with ticket sales through the new site from day one.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="final-cta" id="intake">
         <div className="wrap reveal">
           <div className="cta-proof">

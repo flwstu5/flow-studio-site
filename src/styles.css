@@ -197,6 +197,13 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .step h3 { margin: 0 0 9px; font-size: 17px; }
 .step p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
 
+.testimonial-card { max-width: 780px; padding: 40px 44px; border: 1.5px solid var(--ink); background: var(--paper-bright); box-shadow: 8px 8px 0 var(--red-light); }
+.testimonial-quote { margin: 0 0 26px; font-size: clamp(17px, 2vw, 21px); line-height: 1.55; }
+.testimonial-attribution { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.testimonial-name { font-weight: 600; font-size: 15px; }
+.testimonial-role { color: var(--ink-soft); font-size: 10px; }
+.testimonial-result { margin: 0; padding-top: 14px; border-top: 1px dashed var(--line); color: var(--ink-soft); font-size: 11px; line-height: 1.6; }
+
 .faq { background: var(--paper); }
 .faq-list { max-width: 760px; border-top: 1.5px solid var(--ink); }
 .faq-item { border-bottom: 1px dashed var(--line); padding: 22px 0; }
