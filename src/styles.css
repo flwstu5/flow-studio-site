@@ -66,6 +66,12 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--red-mid); outli
 .menu-button { display: none; border: 0; background: none; color: var(--ink); padding: 6px; }
 .mobile-nav { display: none; }
 
+.not-found { min-height: 100vh; display: flex; align-items: center; }
+.not-found .wrap { text-align: center; max-width: 560px; }
+.not-found h1 { margin: 14px 0 16px; font-size: clamp(38px, 6vw, 58px); line-height: 1; }
+.not-found > .wrap > p { margin: 0 0 30px; color: var(--ink-soft); font-size: 15px; }
+.not-found .section-label { text-align: center; }
+
 .hero { padding: 70px 0 86px; overflow: hidden; }
 .proof {
   position: relative;

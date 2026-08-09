@@ -2,9 +2,26 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowDownRight, ArrowRight, Check, Facebook, Instagram, Linkedin, Menu, X } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 import { submitIntake } from '../server/intake'
+import { trackEvent } from '../lib/analytics'
 
 export const Route = createFileRoute('/')({
   component: FlowStudio,
+  head: () => ({
+    scripts: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        }),
+      },
+    ],
+  }),
 })
 
 const services = [
@@ -187,6 +204,7 @@ function FlowStudio() {
     try {
       await submitIntake({ data: intakeForm })
       setIntakeStatus('sent')
+      trackEvent('Intake Submitted', { serviceType: intakeForm.serviceType })
     } catch {
       setIntakeStatus('error')
     }
@@ -207,6 +225,7 @@ function FlowStudio() {
         },
       })
       setCustomStatus('sent')
+      trackEvent('Intake Submitted', { serviceType: 'Full Custom Website Build' })
     } catch {
       setCustomStatus('error')
     }

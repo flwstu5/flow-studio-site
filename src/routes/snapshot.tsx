@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ArrowRight, CircleCheck, TriangleAlert, CircleX, Minus, Download } from 'lucide-react'
 import { runSnapshot } from '../server/snapshot'
+import { trackEvent } from '../lib/analytics'
 
 export const Route = createFileRoute('/snapshot')({
   component: SnapshotPage,
@@ -121,6 +122,7 @@ function SnapshotPage() {
       if (data.ok) {
         setResult(data)
         setStatus('done')
+        trackEvent('Snapshot Run', { grade: data.grade.letter })
       } else {
         setErrorMsg(data.error)
         setStatus('error')

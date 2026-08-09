@@ -1,4 +1,5 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, Link } from '@tanstack/react-router'
+import { ArrowRight } from 'lucide-react'
 import '../styles.css'
 
 export const Route = createRootRoute({
@@ -34,6 +35,7 @@ export const Route = createRootRoute({
       { rel: 'icon', href: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
       { rel: 'icon', href: '/favicon-192.png', type: 'image/png', sizes: '192x192' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png', sizes: '180x180' },
+      { rel: 'manifest', href: '/site.webmanifest' },
     ],
     scripts: [
       {
@@ -62,7 +64,21 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: NotFound,
 })
+
+function NotFound() {
+  return (
+    <main className="not-found">
+      <div className="wrap">
+        <p className="section-label mono">404</p>
+        <h1 className="display">That page<br />ran out of paper.</h1>
+        <p>The page you're looking for doesn't exist — it may have moved, or the link's off.</p>
+        <Link to="/" className="button button-solid">Back to the homepage <ArrowRight size={14} /></Link>
+      </div>
+    </main>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
