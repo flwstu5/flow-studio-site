@@ -10,6 +10,7 @@ const IntakeSchema = z.object({
   budget: z.string().min(1),
   message: z.string().min(1),
   email: z.string().email(),
+  referralCode: z.string().optional(),
 })
 
 export const submitIntake = createServerFn({ method: 'POST' })
@@ -74,6 +75,38 @@ export const submitIntake = createServerFn({ method: 'POST' })
       onboardingNote = `⚠️ Portal onboarding step failed entirely: ${reason}. Set them up manually.`
     }
 
+    // 1.5. If they entered a referral code, mark it redeemed (pending codes
+    // only, so re-submitting or a stale/expired code doesn't double-count).
+    // This never blocks the submission — worst case, the code note below
+    // just doesn't get flagged and you catch it manually from the code text.
+    let referralNote = ''
+    const trimmedCode = data.referralCode?.trim().toUpperCase()
+    if (trimmedCode) {
+      try {
+        const supabase = getAdminClient()
+        const { data: referral } = await supabase
+          .from('referrals')
+          .select('id, referrer_name, referrer_email, status')
+          .eq('code', trimmedCode)
+          .maybeSingle()
+
+        if (!referral) {
+          referralNote = `Referral code "${trimmedCode}" entered, but no matching referral was found.`
+        } else if (referral.status === 'redeemed') {
+          referralNote = `Referral code "${trimmedCode}" was already redeemed previously — check before applying credit again.`
+        } else {
+          await supabase
+            .from('referrals')
+            .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
+            .eq('id', referral.id)
+          referralNote = `Referral code "${trimmedCode}" redeemed — referred by ${referral.referrer_name} (${referral.referrer_email}). Apply their free month credit.`
+        }
+      } catch (referralError) {
+        const reason = referralError instanceof Error ? referralError.message : String(referralError)
+        referralNote = `⚠️ Referral code "${trimmedCode}" entered, but lookup failed (${reason}). Check the referrals table manually.`
+      }
+    }
+
     // 2. Email you the full brief, plus the onboarding status above. This MUST
     // succeed for the submission to count as successful — it's the actual
     // lead notification, and now it's also the only place you'll see whether
@@ -89,6 +122,7 @@ export const submitIntake = createServerFn({ method: 'POST' })
       <p>${data.message.replace(/\n/g, '<br />')}</p>
       <hr />
       <p><strong>Portal onboarding status:</strong><br />${onboardingNote}</p>
+      ${referralNote ? `<p><strong>Referral:</strong><br />${referralNote}</p>` : ''}
     `
     await sendEmail({
       to: 'admin@flowstudiogrfx.com',

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowDownRight, ArrowRight, Check, Facebook, Instagram, Linkedin, Menu, X } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 import { submitIntake } from '../server/intake'
+import { submitReferral } from '../server/referral'
 import { trackEvent } from '../lib/analytics'
 
 export const Route = createFileRoute('/')({
@@ -176,8 +177,18 @@ function FlowStudio() {
     serviceType: 'Logo & brand design',
     budget: '',
     message: '',
+    referralCode: '',
   })
   const [intakeStatus, setIntakeStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  const [referralForm, setReferralForm] = useState({
+    referrerName: '',
+    referrerEmail: '',
+    referredBusiness: '',
+    referredEmail: '',
+  })
+  const [referralStatus, setReferralStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [referralCodeResult, setReferralCodeResult] = useState('')
 
   const [customForm, setCustomForm] = useState({
     name: '',
@@ -196,6 +207,23 @@ function FlowStudio() {
 
   function updateCustomField(field: string, value: string) {
     setCustomForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function updateReferralField(field: string, value: string) {
+    setReferralForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  async function handleReferralSubmit(e: FormEvent) {
+    e.preventDefault()
+    setReferralStatus('sending')
+    try {
+      const result = await submitReferral({ data: referralForm })
+      setReferralCodeResult(result.code)
+      setReferralStatus('sent')
+      trackEvent('Referral Submitted')
+    } catch {
+      setReferralStatus('error')
+    }
   }
 
   async function handleIntakeSubmit(e: FormEvent) {
@@ -233,19 +261,23 @@ function FlowStudio() {
 
   // Supports deep-linking from the snapshot tool with a prefilled brief:
   // /?serviceType=...&message=...&business=...&email=...#intake
+  // Also supports referral links: /?ref=CODE#intake prefills the referral
+  // code field so it rides along with their project brief.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const serviceType = params.get('serviceType')
     const message = params.get('message')
     const business = params.get('business')
     const email = params.get('email')
-    if (!serviceType && !message && !business && !email) return
+    const ref = params.get('ref')
+    if (!serviceType && !message && !business && !email && !ref) return
     setIntakeForm((prev) => ({
       ...prev,
       serviceType: serviceType ?? prev.serviceType,
       message: message ?? prev.message,
       business: business ?? prev.business,
       email: email ?? prev.email,
+      referralCode: ref ?? prev.referralCode,
     }))
     document.getElementById('intake')?.scrollIntoView({ block: 'start' })
   }, [])
@@ -590,6 +622,71 @@ function FlowStudio() {
         </div>
       </section>
 
+      <section className="referral section" id="referral">
+        <div className="wrap reveal">
+          <p className="section-label mono">06 / Referrals</p>
+          <div className="section-heading">
+            <h2 className="display">Know a business<br />that needs this?</h2>
+            <p>Refer them to Flow Studio — when they mention your code in their project brief, you both get a free month on any flyer subscription plan.</p>
+          </div>
+
+          {referralStatus === 'sent' ? (
+            <div className="testimonial-card" style={{ textAlign: 'center' }}>
+              <p style={{ fontWeight: 600, fontSize: 18 }}>
+                Your referral code: <span className="mono">{referralCodeResult}</span>
+              </p>
+              <p>
+                Share it with {referralForm.referredBusiness || 'them'} — have them enter it when they submit their
+                project brief. Once their subscription starts, we'll apply your free month.
+              </p>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleReferralSubmit}
+              style={{ display: 'grid', gap: 14, maxWidth: 480, margin: '28px auto 0', textAlign: 'left' }}
+            >
+              <input
+                required
+                aria-label="Your name"
+                placeholder="Your name"
+                value={referralForm.referrerName}
+                onChange={(e) => updateReferralField('referrerName', e.target.value)}
+              />
+              <input
+                required
+                type="email"
+                aria-label="Your email"
+                placeholder="Your email"
+                value={referralForm.referrerEmail}
+                onChange={(e) => updateReferralField('referrerEmail', e.target.value)}
+              />
+              <input
+                required
+                aria-label="Business you're referring"
+                placeholder="Business you're referring"
+                value={referralForm.referredBusiness}
+                onChange={(e) => updateReferralField('referredBusiness', e.target.value)}
+              />
+              <input
+                type="email"
+                aria-label="Their email (optional)"
+                placeholder="Their email (optional)"
+                value={referralForm.referredEmail}
+                onChange={(e) => updateReferralField('referredEmail', e.target.value)}
+              />
+              <button type="submit" className="button button-solid" disabled={referralStatus === 'sending'}>
+                {referralStatus === 'sending' ? 'Sending…' : 'Get my referral code'} <ArrowRight size={17} />
+              </button>
+              {referralStatus === 'error' && (
+                <p style={{ color: '#a31e22', fontSize: 13 }}>
+                  Something went wrong — try again, or email admin@flowstudiogrfx.com directly.
+                </p>
+              )}
+            </form>
+          )}
+        </div>
+      </section>
+
       <section className="final-cta" id="intake">
         <div className="wrap reveal">
           <div className="cta-proof">
@@ -654,6 +751,12 @@ function FlowStudio() {
                   placeholder="Tell us about the project"
                   value={intakeForm.message}
                   onChange={(e) => updateIntakeField('message', e.target.value)}
+                />
+                <input
+                  aria-label="Referral code (optional)"
+                  placeholder="Referral code (optional)"
+                  value={intakeForm.referralCode}
+                  onChange={(e) => updateIntakeField('referralCode', e.target.value)}
                 />
                 <button type="submit" className="button button-solid" disabled={intakeStatus === 'sending'}>
                   {intakeStatus === 'sending' ? 'Sending…' : 'Submit project brief'} <ArrowRight size={17} />
