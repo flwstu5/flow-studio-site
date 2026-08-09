@@ -3,6 +3,7 @@ import { ArrowDownRight, ArrowRight, Check, Facebook, Instagram, Linkedin, Menu,
 import { createFileRoute } from '@tanstack/react-router'
 import { submitIntake } from '../server/intake'
 import { submitReferral } from '../server/referral'
+import { getApprovedTestimonials } from '../server/testimonials'
 import { trackEvent } from '../lib/analytics'
 
 export const Route = createFileRoute('/')({
@@ -51,6 +52,16 @@ const services = [
     color: 'blend',
   },
 ]
+
+const defaultTestimonial = {
+  id: 'default',
+  business_name: 'Aaliyah Garcia',
+  quote:
+    "It's one thing to hire somebody who can do the work. It's another thing to work with somebody who genuinely puts their ALL into what they do — someone who cares about the outcome, listens to your vision, and treats what you're building like it actually matters. You didn't just build me a website. You helped me create a digital home for a vision that means so much to me.",
+  role: 'Founder, Bridgeway Collective',
+  result:
+    'Website design & launch — live in time for their Small Business Growth & Networking Experience, with ticket sales through the new site from day one.',
+}
 
 const plans = [
   {
@@ -190,6 +201,8 @@ function FlowStudio() {
   const [referralStatus, setReferralStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [referralCodeResult, setReferralCodeResult] = useState('')
 
+  const [testimonials, setTestimonials] = useState([defaultTestimonial])
+
   const [customForm, setCustomForm] = useState({
     name: '',
     email: '',
@@ -280,6 +293,18 @@ function FlowStudio() {
       referralCode: ref ?? prev.referralCode,
     }))
     document.getElementById('intake')?.scrollIntoView({ block: 'start' })
+  }, [])
+
+  // Testimonials are curated in the client portal — fetch whatever's
+  // currently published and swap in for the default. Keeps the default in
+  // place (rather than an empty section) if there's nothing published yet
+  // or the fetch fails.
+  useEffect(() => {
+    getApprovedTestimonials()
+      .then((result) => {
+        if (result.testimonials.length > 0) setTestimonials(result.testimonials)
+      })
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -603,21 +628,17 @@ function FlowStudio() {
             <h2 className="display">Don't take<br />our word for it.</h2>
             <p>Real feedback from people we've built for.</p>
           </div>
-          <div className="testimonial-card">
-            <p className="testimonial-quote">
-              "It's one thing to hire somebody who can do the work. It's another thing to work with somebody who
-              genuinely puts their ALL into what they do — someone who cares about the outcome, listens to your
-              vision, and treats what you're building like it actually matters. You didn't just build me a website.
-              You helped me create a digital home for a vision that means so much to me."
-            </p>
-            <div className="testimonial-attribution">
-              <span className="testimonial-name">Aaliyah Garcia</span>
-              <span className="mono testimonial-role">Founder, Bridgeway Collective</span>
-            </div>
-            <p className="mono testimonial-result">
-              Website design &amp; launch — live in time for their Small Business Growth &amp; Networking Experience,
-              with ticket sales through the new site from day one.
-            </p>
+          <div style={{ display: 'grid', gap: 24 }}>
+            {testimonials.map((t) => (
+              <div className="testimonial-card" key={t.id}>
+                <p className="testimonial-quote">"{t.quote}"</p>
+                <div className="testimonial-attribution">
+                  <span className="testimonial-name">{t.business_name}</span>
+                  {t.role && <span className="mono testimonial-role">{t.role}</span>}
+                </div>
+                {t.result && <p className="mono testimonial-result">{t.result}</p>}
+              </div>
+            ))}
           </div>
         </div>
       </section>
